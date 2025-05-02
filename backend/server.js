@@ -16,8 +16,8 @@ mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
 app.use(bodyParser.json());
 app.use(cors());
 
-app.get('/', (req, res) => {
-  res.send('Hello from MERN stack!');
+app.get('/courswap', (req, res) => {
+  res.send({'temp':'Hello from MERN stack!'});
 });
 
 app.listen(PORT, () => {
