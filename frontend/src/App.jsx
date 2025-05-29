@@ -5,12 +5,15 @@ import MainPage from './MainPage';
 import LoginRegister from './pages/LoginRegister';
 import { useAuth } from './component/AuthProvider';
 
+import GMAP from './gMapImp/gMap';
+
 function App() {
   const { user, logout } = useAuth();
 
   return (
     <StrictMode>
       <Header/>
+      <GMAP/>
       <BrowserRouter>
         { user ?
           <Routes>
