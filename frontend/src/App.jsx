@@ -1,7 +1,10 @@
 import { useEffect, useState, StrictMode } from 'react';
-
+import GCalendar from './components/calendar/GCalendar'
+import CalendarSlotPicker from './components/calendar/CalendarSlotPicker';
 
 const service = process.env.DOMAIN+'/app';
+
+
 function App() {
   const [message, setMessage] = useState('');
 
@@ -15,10 +18,12 @@ function App() {
     <StrictMode>
       <div>
         <h1>test1133223</h1>
-        <h2>{message}</h2>
+        <h1>CoursWap - Créneaux disponibles</h1>
+      <CalendarSlotPicker />
       </div>
     </StrictMode> 
   );
+  
 }
 
 export default App;
