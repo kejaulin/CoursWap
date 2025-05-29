@@ -1,7 +1,9 @@
 import { useEffect, useState, StrictMode } from 'react';
-
+import Header from './Header';
+import MainPage from './MainPage';
 
 const service = process.env.DOMAIN+'/app';
+
 function App() {
   const [message, setMessage] = useState('');
 
@@ -13,10 +15,8 @@ function App() {
 
   return (
     <StrictMode>
-      <div>
-        <h1>test1133223</h1>
-        <h2>{message}</h2>
-      </div>
+      <Header/>
+      <MainPage/>
     </StrictMode> 
   );
 }
