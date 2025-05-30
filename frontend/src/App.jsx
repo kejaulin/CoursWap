@@ -13,10 +13,19 @@ function App() {
       .then(data => setMessage(data.temp));
   }, []);
 
+  const [googleConnexionId, setConnexion] = useState('');
+  useEffect( () => {
+      fetch(`${process.env.DOMAIN+'/api/current_user'}`,{credentials:'include'})
+        .then(res => res.json())
+        .then(user => setConnexion(user.googleId));
+  }, []);
+
+  let connexionId = googleConnexionId;
+
   return (
     <StrictMode>
-      <Header/>
-      <MainPage/>
+      <Header connexionId={connexionId}/>
+      <MainPage connexionId={connexionId}/>
     </StrictMode> 
   );
 }
