@@ -37,6 +37,10 @@ app.get('/courswap', (req, res) => {
   res.send({'temp':'Hello from MERN stack!'});
 });
 
+app.get('/courses', (req, res) => {
+  res.send({'allCourses':["Maths","Français","Physique","Chimie"]});
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}.`);
 });

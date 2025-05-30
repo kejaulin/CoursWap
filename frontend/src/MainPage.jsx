@@ -1,9 +1,15 @@
-import {useState } from 'react';
+import {useEffect, useState } from 'react';
 
 function MainPage({connexionId}){
 
-    const allCourses =["Maths","Français","Physique","Chimie"];
     const [selectedSubject, setSelectedSubject] = useState(null);
+    const [allCourses, setCourses] = useState([]);
+
+    useEffect(() => {
+        fetch('/api/courses')
+          .then(res => res.json())
+          .then(data => setCourses(data.allCourses))
+      }, []);
 
     if (connexionId ==undefined){
         return(
