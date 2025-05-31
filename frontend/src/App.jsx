@@ -1,11 +1,10 @@
-import { useEffect, useState, StrictMode } from 'react';
-import GCalendar from './components/calendar/GCalendar'
-import CalendarSlotPicker from './components/calendar/CalendarSlotPicker';
+import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import GCalendar from './components/calendar/GCalendar';
+import CalendarSlotPicker from './components/calendar/CalendarSlotPicker';
 import ContactProfesseur from './pages/ContactProfesseur';
 
-const service = process.env.DOMAIN+'/app';
-
+const service = process.env.DOMAIN + '/app';
 
 function App() {
   const [message, setMessage] = useState('');
@@ -17,24 +16,19 @@ function App() {
   }, []);
 
   return (
-    <StrictMode>
-      <div>
-        <h1>test1133223</h1>
-        <h1>CoursWap - Créneaux disponibles</h1>
-      <CalendarSlotPicker />
-      </div>
-        <Routes>
-        <Route path="/" element={
+    <Routes>
+      <Route
+        path="/"
+        element={
           <div>
-            <h1>test1133223</h1>
+            <h1>test Frontend </h1>
             <h2>{message}</h2>
           </div>
-        } />
-        <Route path="/profs/:id" element={<ContactProfesseur />} />
-      </Routes>
-    </StrictMode> 
+        }
+      />
+      <Route path="/profs/:id" element={<ContactProfesseur />} />
+    </Routes>
   );
-  
 }
 
 export default App;
