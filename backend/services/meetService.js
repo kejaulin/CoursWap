@@ -1,126 +1,82 @@
-const fs = require('fs').promises;
-const path = require('path');
-const process = require('process');
-const {authenticate} = require('@google-cloud/local-auth');
-const {google} = require('googleapis');
+const { google } = require('googleapis');
 
-//const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
-const SCOPES = ["https://www.googleapis.com/auth/calendar"]
-const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
-
-/**
- * Reads previously authorized credentials from the save file.
- *
- * @return {Promise<OAuth2Client|null>}
- */
-async function loadSavedCredentialsIfExist() {
-  try {
-    const content = await fs.readFile(TOKEN_PATH);
-    const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
-  } catch (err) {
-    return null;
-  }
+function isGoogleMeetEvent(event) {
+    return (event.hangoutLink);
 }
 
-/**
- * Serializes credentials to a file compatible with GoogleAuth.fromJSON.
- *
- * @param {OAuth2Client} client
- * @return {Promise<void>}
- */
-async function saveCredentials(client) {
-  const content = await fs.readFile(CREDENTIALS_PATH);
-  const keys = JSON.parse(content);
-  const key = keys.installed || keys.web;
-  const payload = JSON.stringify({
-    type: 'authorized_user',
-    client_id: key.client_id,
-    client_secret: key.client_secret,
-    refresh_token: client.credentials.refresh_token,
-  });
-  await fs.writeFile(TOKEN_PATH, payload);
-}
+const meetService = {
+    async listEvents(auth) {
+        const calendar = google.calendar({ version: 'v3', auth });
+        const res = await calendar.events.list({
+            calendarId: 'primary',
+            timeMin: new Date().toISOString(),
+            maxResults: 10,
+            singleEvents: true,
+            orderBy: 'startTime',
+        });
+        return (res.data.items || []).filter(isGoogleMeetEvent);
+    },
 
-/**
- * Load or request or authorization to call APIs.
- *
- */
-async function authorize() {
-  let client = await loadSavedCredentialsIfExist();
-  if (client) {
-    return client;
-  }
-  client = await authenticate({
-    scopes: SCOPES,
-    keyfilePath: CREDENTIALS_PATH,
-  });
-  if (client.credentials) {
-    await saveCredentials(client);
-  }
-  return client;
-}
-
-/**
- * Lists the next 10 events on the user's primary calendar.
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
-async function listEvents(auth) {
-  const calendar = google.calendar({version: 'v3', auth});
-  const res = await calendar.events.list({
-    calendarId: 'primary',
-    timeMin: new Date().toISOString(),
-    maxResults: 10,
-    singleEvents: true,
-    orderBy: 'startTime',
-  });
-  const events = res.data.items;
-  if (!events || events.length === 0) {
-    console.log('No upcoming events found.');
-    return;
-  }
-  console.log('Upcoming 10 events:');
-  events.map((event, i) => {
-    const start = event.start.dateTime || event.start.date;
-    console.log(`${start} - ${event.summary}`);
-  });
-}
-
-async function createGoogleMeet(auth){
-    const calendar = google.calendar({version: 'v3', auth});
-    const event = {
-        summary: 'Test Meeting',
-        start: {
-            dateTime: new Date().toISOString(),
-        },
-        end: {
-            dateTime: new Date(new Date().getTime() + 3600000).toISOString(), // 1 hour later
-        },
-        conferenceData: {
-            createRequest: {
-                requestId: Math.random().toString(36).substring(2, 15),
-                conferenceSolutionKey: {type: 'hangoutsMeet'},
+    async createGoogleMeet(auth, { summary = 'Test Meeting', startDateTime, endDateTime } = {}) {
+        const calendar = google.calendar({ version: 'v3', auth });
+        const event = {
+            summary,
+            start: { dateTime: startDateTime || new Date().toISOString() },
+            end: { dateTime: endDateTime || new Date(new Date().getTime() + 3600000).toISOString() },
+            conferenceData: {
+                createRequest: {
+                    requestId: Math.random().toString(36).substring(2, 15),
+                    conferenceSolutionKey: { type: 'hangoutsMeet' },
+                },
             },
-        },
-    };
-    const response = await calendar.events.insert({
-        calendarId: 'primary',
-        resource: event,
-        conferenceDataVersion: 1,
-    });
+        };
+        const response = await calendar.events.insert({
+            calendarId: 'primary',
+            resource: event,
+            conferenceDataVersion: 1,
+        });
+        return response.data;
+    },
 
-    return response.data;
-}
+    async getEvent(auth, eventId) {
+        const calendar = google.calendar({ version: 'v3', auth });
+        const res = await calendar.events.get({
+            calendarId: 'primary',
+            eventId,
+        });
+        return isGoogleMeetEvent(res.data) ? res.data : null;
+    },
 
-authorize()
-    .then(auth => {
-        console.log('Authorized successfully');
-        return createGoogleMeet(auth);
-    })
-    .then(meetObj => {
-        console.log('Google Meet link:', meetObj);
-    })
-    .catch(error => {
-        console.error('Error during authorization or meeting creation:', error);
-    });
+    async deleteEvent(auth, eventId) {
+        const calendar = google.calendar({ version: 'v3', auth });
+        const res = await calendar.events.get({
+            calendarId: 'primary',
+            eventId,
+        });
+        if (isGoogleMeetEvent(res.data)) {
+            await calendar.events.delete({
+                calendarId: 'primary',
+                eventId,
+            });
+        }
+    },
+
+    async updateEvent(auth, eventId, updates) {
+        const calendar = google.calendar({ version: 'v3', auth });
+        const res = await calendar.events.get({
+            calendarId: 'primary',
+            eventId,
+        });
+        if (!isGoogleMeetEvent(res.data)) {
+            return null;
+        }
+        const updated = await calendar.events.patch({
+            calendarId: 'primary',
+            eventId,
+            resource: updates,
+        });
+        return updated.data;
+    }
+};
+
+module.exports = meetService;
