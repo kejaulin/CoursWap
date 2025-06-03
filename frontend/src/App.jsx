@@ -1,7 +1,9 @@
 import { useEffect, useState, StrictMode } from 'react';
-
+import Header from './Header';
+import MainPage from './MainPage';
 
 const service = process.env.DOMAIN+'/app';
+
 function App() {
   const [message, setMessage] = useState('');
 
@@ -11,12 +13,19 @@ function App() {
       .then(data => setMessage(data.temp));
   }, []);
 
+  const [googleConnexionId, setConnexion] = useState('');
+  useEffect( () => {
+      fetch(`${process.env.DOMAIN+'/api/current_user'}`,{credentials:'include'})
+        .then(res => res.json())
+        .then(user => setConnexion(user.googleId));
+  }, []);
+
+  let connexionId = googleConnexionId;
+
   return (
     <StrictMode>
-      <div>
-        <h1>test1133223</h1>
-        <h2>{message}</h2>
-      </div>
+      <Header connexionId={connexionId}/>
+      <MainPage connexionId={connexionId}/>
     </StrictMode> 
   );
 }
