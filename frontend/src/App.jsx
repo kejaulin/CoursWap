@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { StrictMode, useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import GCalendar from '../components/calendar/GCalendar';
 import CalendarSlotPicker from '../components/calendar/CalendarSlotPicker';
 import ContactProfesseur from './pages/ContactProfesseur';
@@ -16,6 +16,8 @@ function App() {
   }, []);
 
   return (
+    <StrictMode>
+      <BrowserRouter>
     <Routes>
       <Route
         path="/"
@@ -28,6 +30,8 @@ function App() {
       />
       <Route path="/profs/:id" element={<ContactProfesseur />} />
     </Routes>
+    </BrowserRouter>
+    </StrictMode>
   );
 }
 

@@ -100,15 +100,12 @@ function ContactProfesseur() {
   return (
     <div className="contact-prof">
       <header className="header">
-        <img src="../img/Courswap.png" alt="Courswap" className="logo" />
+        <img src="../img/appLogo.png" alt="Courswap" className="logo" />
       </header>
 
       <section className="prof-info">
         <img
-          src={prof.photo}
-          alt={`Photo de ${prof.nom}`}
-          className="avatar"
-        />
+          src={prof.photo} alt={`Photo de ${prof.nom}`}bclassName="avatar"/>
         <div>
           <h2>{prof.nom}</h2>
           <p>Professeur de {prof.matiere}</p>
