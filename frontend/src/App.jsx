@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import GCalendar from '../src/GCalendar';
-import CalendarSlotPicker from '../src/CalendarSlotPicker';
+import GCalendar from '../components/calendar/GCalendar';
+import CalendarSlotPicker from '../components/calendar/CalendarSlotPicker';
 import ContactProfesseur from './pages/ContactProfesseur';
 
 const service = process.env.DOMAIN + '/app';
