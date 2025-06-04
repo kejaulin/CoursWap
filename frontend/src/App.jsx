@@ -2,6 +2,7 @@ import { StrictMode, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ContactProfesseur from './pages/ContactProfesseur';import Header from './Header';
 import MainPage from './MainPage';
+import LoginRegister from './pages/LoginRegister';
 
 const service = process.env.DOMAIN + '/app';
 
@@ -14,14 +15,12 @@ function App() {
       .then(data => setMessage(data.temp));
   }, []);
 
-  const [googleConnexionId, setConnexion] = useState('');
+  const [connexionId, setConnexion] = useState('');
   useEffect( () => {
       fetch(`${process.env.DOMAIN+'/api/auth/current_user'}`,{credentials:'include'})
         .then(res => res.json())
-        .then(user => setConnexion(user.googleId));
+        .then(user => setConnexion(user._id));
   }, []);
-
-  let connexionId = googleConnexionId;
 
   return (
     <StrictMode>
@@ -34,7 +33,8 @@ function App() {
           </Routes>
         :
         <Routes>
-          <Route path="*" element={<MainPage connexionId={connexionId} />} />
+          <Route path="/loginPage" element={<LoginRegister />} />
+          <Route path="*" element={window.location.pathname !== "/loginPage" ? <MainPage connexionId={connexionId} /> : <div />} />
         </Routes>
         }
       </BrowserRouter>
