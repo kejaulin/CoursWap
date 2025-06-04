@@ -48,4 +48,7 @@ app.get('/courses', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}.`);
-});
+}); 
+
+const professeursRoutes = require('./routes/professeurRoutes');
+app.use('/professeurs', professeursRoutes);
