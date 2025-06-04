@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { gapi } from 'gapi-script';
 import moment from 'moment';
 
-const clientId = "882025545288-d6jj90v0tlq2fm0rprshbvc1gfegvsvp.apps.googleusercontent.com";
+const clientId = import.meta.env.VITE_GCALENDAR_API_KEY;
 
 function ContactProfesseur() {
   const { id } = useParams(); 
@@ -23,7 +23,7 @@ function ContactProfesseur() {
 
   // Charger les infos du prof dès que "id" change
   useEffect(() => {
-    fetch(`http://localhost:4000/api/professeurs/${id}`)
+    fetch(`http://localhost:4000/professeurs/${id}`)
       .then(res => {
         if (!res.ok) throw new Error("404");
         return res.json();

@@ -1,12 +1,18 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const cookieSession = require('cookie-session');
+const passport = require('passport');
 const mongoose = require('mongoose');
+
 require("dotenv").config();
+require('./models/User');
+require('./services/authService');
 
 const app = express();
 const PORT = process.env.SERVER_PORT;
 
+const authRoutes = require('./routes/authRoutes');
 
 mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
     console.log('Connected to MongoDB.');
@@ -15,14 +21,34 @@ mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
   });
 
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({origin:'http://localhost:3000',
+  methods: "GET,POST,PUT,DELETE",
+  credentials:true}));
+
+// OAuth --
+app.use(
+  cookieSession({
+    maxAge: 30*24*60*60*1000,
+    keys: [process.env.COOKIE_KEY]
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use('/auth',authRoutes);
+// --------
 
 app.get('/courswap', (req, res) => {
   res.send({'temp':'Hello from MERN stack!'});
 });
 
+app.get('/courses', (req, res) => {
+  res.send({'allCourses':["Maths","Français","Physique","Chimie"]});
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}.`);
 }); 
-const professeursRoutes = require('./routes/professeur.js');
-app.use('/api/professeurs', professeursRoutes);
+
+const professeursRoutes = require('./routes/professeurRoutes');
+app.use('/professeurs', professeursRoutes);
