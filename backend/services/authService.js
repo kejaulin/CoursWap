@@ -27,7 +27,7 @@ passport.use(
         if (existingUser) {
           done(null, existingUser);
         } else {
-          new User({ googleId: profile.id })
+          new User({ googleId: profile.id,accessToken: accessToken })
             .save()
             .then(user => done(null, user));
         }
