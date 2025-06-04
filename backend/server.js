@@ -7,10 +7,12 @@ const mongoose = require('mongoose');
 
 require("dotenv").config();
 require('./models/User');
-require('./services/passport');
+require('./services/authService');
 
 const app = express();
 const PORT = process.env.SERVER_PORT;
+
+const authRoutes = require('./routes/authRoutes');
 
 mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
     console.log('Connected to MongoDB.');
@@ -19,7 +21,9 @@ mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
   });
 
 app.use(bodyParser.json());
-app.use(cors({origin:'http://localhost:3000',credentials:true}));
+app.use(cors({origin:'http://localhost:3000',
+  methods: "GET,POST,PUT,DELETE",
+  credentials:true}));
 
 // OAuth --
 app.use(
@@ -30,7 +34,8 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-require('./routes/authRoutes')(app);
+
+app.use('/auth',authRoutes);
 // --------
 
 app.get('/courswap', (req, res) => {
