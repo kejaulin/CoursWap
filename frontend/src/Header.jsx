@@ -1,6 +1,6 @@
 function Header({connexionId}){
   const handleLogout = ()=>{
-    fetch('/api/logout',{
+    fetch('/api/auth/logout',{
         credentials:'include',
         method:'POST',
     }).then(()=>{
