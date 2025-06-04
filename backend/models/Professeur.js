@@ -8,4 +8,4 @@ const ProfesseurSchema = new mongoose.Schema({
   disponibilites: [String] 
 });
 
-module.exports = mongoose.model('Professeur', ProfesseurSchema);
+module.exports = mongoose.model('professeurs', ProfesseurSchema);
