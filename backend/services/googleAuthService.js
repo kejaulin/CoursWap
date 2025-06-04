@@ -20,6 +20,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorizationURL: 'https://accounts.google.com/o/oauth2/v2/auth',
       callbackURL: '/auth/google/callback',
     },
     (accessToken, refreshToken, profile, done) => {
@@ -27,7 +28,7 @@ passport.use(
         if (existingUser) {
           done(null, existingUser);
         } else {
-          new User({ googleId: profile.id,accessToken: accessToken })
+          new User({ googleId: profile.id,accessToken: accessToken,authMethod: 'google', email: profile.emails[0].value })
             .save()
             .then(user => done(null, user));
         }

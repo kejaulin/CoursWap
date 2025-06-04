@@ -53,3 +53,6 @@ app.listen(PORT, () => {
 
 const professeursRoutes = require('./routes/professeurRoutes');
 app.use('/professeurs', professeursRoutes);
+
+const calendarRoutes = require('./routes/calendarRoutes');
+app.use('/calendar', calendarRoutes);
