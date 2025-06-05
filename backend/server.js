@@ -10,7 +10,10 @@ require('./models/User');
 require('./services/googleAuthService');
 require('./services/localAuthService');
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 const app = express();
+const meetRoutes = require('./routes/meetRoutes');
 const PORT = process.env.SERVER_PORT;
 
 const authRoutes = require('./routes/authRoutes');
@@ -39,9 +42,28 @@ app.use(passport.session());
 app.use('/auth',authRoutes);
 // --------
 
-app.get('/courswap', (req, res) => {
-  res.send({'temp':'Hello from MERN stack!'});
-});
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'CoursWap API',
+      version: '1.0.0',
+      description: 'Documentation de l’API CoursWap',
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+      },
+    ],
+  },
+  apis: ['./routes/*.js'],
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use('/api/meetings', meetRoutes);
+
 
 app.get('/courses', (req, res) => {
   res.send({'allCourses':["Maths","Français","Physique","Chimie"]});
@@ -49,6 +71,7 @@ app.get('/courses', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}.`);
+  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
 }); 
 
 const professeursRoutes = require('./routes/professeurRoutes');
