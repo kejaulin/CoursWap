@@ -64,13 +64,15 @@ function ContactProfesseur() {
         body: JSON.stringify(formData),
       }).then(async (res) => {
         if (res.ok){
-          const blob = await res.blob();
-          const url2 = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url2;
-          a.download = 'meetingInfos.ics';
-          a.click();
-          URL.revokeObjectURL(url2);
+          if(calendarActions[provider].endpoint === 'ical'){
+            const blob = await res.blob();
+            const url2 = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url2;
+            a.download = 'meetingInfos.ics';
+            a.click();
+            URL.revokeObjectURL(url2);  
+          }
           alert('Le rendez-vous a été ajouté à ton calendrier !');
         }
       });

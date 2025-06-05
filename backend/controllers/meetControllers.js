@@ -3,7 +3,7 @@ const meetService = require('../services/meetService');
 
 exports.createMeet = async (req, res) => {
     try {
-        const auth = await authService.authorize();
+        const auth = await authService.getAuthorizedClient(req.user);
         const event = await meetService.createGoogleMeet(auth, req.body);
         res.status(201).json(event);
     } catch (err) {
@@ -13,7 +13,7 @@ exports.createMeet = async (req, res) => {
 
 exports.listMeets = async (req, res) => {
     try {
-        const auth = await authService.authorize();
+        const auth = await authService.getAuthorizedClient(req.user);
         const events = await meetService.listEvents(auth);
         res.json(events);
     } catch (err) {
@@ -23,7 +23,7 @@ exports.listMeets = async (req, res) => {
 
 exports.getMeet = async (req, res) => {
     try {
-        const auth = await authService.authorize();
+        const auth = await authService.getAuthorizedClient(req.user);
         const event = await meetService.getEvent(auth, req.params.id);
         res.json(event);
     } catch (err) {
@@ -33,7 +33,7 @@ exports.getMeet = async (req, res) => {
 
 exports.deleteMeet = async (req, res) => {
     try {
-        const auth = await authService.authorize();
+        const auth = await authService.getAuthorizedClient(req.user);
         await meetService.deleteEvent(auth, req.params.id);
         res.status(204).send();
     } catch (err) {
@@ -43,7 +43,7 @@ exports.deleteMeet = async (req, res) => {
 
 exports.updateMeet = async (req, res) => {
     try {
-        const auth = await authService.authorize();
+        const auth = await authService.getAuthorizedClient(req.user);
         const event = await meetService.updateEvent(auth, req.params.id, req.body);
         res.json(event);
     } catch (err) {

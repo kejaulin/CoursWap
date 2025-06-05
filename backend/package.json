@@ -20,7 +20,7 @@
     "googleapis": "^149.0.0",
     "mongoose": "^8.14.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
     "google-auth-library": "^9.15.1",
     "ics": "^3.8.1",
     "moment": "^2.30.1",
