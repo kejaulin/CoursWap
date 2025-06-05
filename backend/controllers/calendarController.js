@@ -1,6 +1,7 @@
 const moment = require('moment');
 const { google } = require('googleapis');
 const { getAuthorizedClient } = require('../services/googleAuthTokenRefresher');
+const { createEvent} = require('ics');
 require('dotenv').config();
 
 exports.addGoogleCalendarEvent = async (req,res,next) =>{
@@ -48,8 +49,34 @@ exports.addGoogleCalendarEvent = async (req,res,next) =>{
 
 exports.addIcalEvent = async (req,res,next) =>{
     try{
-        console.log("pas de bol");
-        res.send({success: true});
+        const formData = req.body;
+
+        const [startHour, endHour] = formData.disponibilites.split(' - ');
+        const startDateTime = moment(`${formData.date}T${startHour}`).toISOString();
+        const endDateTime   = moment(`${formData.date}T${endHour}`).toISOString();
+        
+        const prof = await fetch(`http://localhost:4000/professeurs/${formData.profId}`)
+        .then(res => {
+          if (!res.ok) throw new Error("404");
+          return res.json();
+        })
+
+        const event = {
+          title: `Cours de ${formData.chapitres} avec ${prof.nom}`,
+          description: `Cours pour la classe ${formData.classe}`,
+          start:[2025, 6,12,14,0],
+          location: 'Jitsi Online meeting',
+          url: 'http://localhost:3000',
+          organizer:{ name: 'CoursWap'},
+        };
+
+        createEvent(event,(error,value)=>{
+          if(error) return res.status(500).send('Failed to generate iCal Event.');
+
+          res.setHeader('Content-Type', 'text/calendar');
+          res.setHeader('Content-Disposition', 'attachment; filename=event.ics');
+          res.send(value);
+        })
     } catch (err){
         next(err);
         res.status(500).json({ error: err.message });   

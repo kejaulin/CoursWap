@@ -4,6 +4,17 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../component/AuthProvider';
 
 function ContactProfesseur() {
+
+  const calendarActions = {
+    google: {
+      label: 'Ajouter à mon agenda Google',
+      endpoint: 'google'
+    },
+    local: {
+      label: 'Générer mon évènement calendrier',
+      endpoint: 'ical'
+    },
+  };
   const { id } = useParams(); 
 
   const [formData, setFormData] = useState({
@@ -19,7 +30,7 @@ function ContactProfesseur() {
   const [prof, setProf] = useState(null);
 
   const { user, logout } = useAuth();
-  
+  const provider = user?.authMethod || 'local';
   // Charger les infos du prof dès que "id" change
   useEffect(() => {
     fetch(`http://localhost:4000/professeurs/${id}`)
@@ -44,16 +55,8 @@ function ContactProfesseur() {
     e.preventDefault();
     if (!prof) return; // sécurité
 
-    let endpoint ='';
-    switch(user.authMethod){
-      case 'google': endpoint = 'google';
-        break;
-      case 'local': endpoint = 'ical';
-        break;
-    }
-
     try {
-      const url = new URL(`api/calendar/${endpoint}`, window.location.origin);
+      const url = new URL(`api/calendar/${calendarActions[provider].endpoint || calendarActions.local.endpoint}`, window.location.origin);
       fetch(url.href,{
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -61,8 +64,14 @@ function ContactProfesseur() {
         body: JSON.stringify(formData),
       }).then(async (res) => {
         if (res.ok){
-          console.log("YESSSSSSSS");
-          alert('Le rendez-vous a été ajouté dans ton Google Calendar !');
+          const blob = await res.blob();
+          const url2 = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url2;
+          a.download = 'meetingInfos.ics';
+          a.click();
+          URL.revokeObjectURL(url2);
+          alert('Le rendez-vous a été ajouté à ton calendrier !');
         }
       });
     } catch (error) {
@@ -161,7 +170,7 @@ function ContactProfesseur() {
           </div>
         )}
 
-        <button type="submit">Envoyer la demande</button>
+        <button type="submit">{calendarActions[provider].label || calendarActions.local.label}</button>
       </form>
     </div>
   );
