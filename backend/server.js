@@ -7,7 +7,8 @@ const mongoose = require('mongoose');
 
 require("dotenv").config();
 require('./models/User');
-require('./services/authService');
+require('./services/googleAuthService');
+require('./services/localAuthService');
 
 const app = express();
 const PORT = process.env.SERVER_PORT;
@@ -25,7 +26,7 @@ app.use(cors({origin:'http://localhost:3000',
   methods: "GET,POST,PUT,DELETE",
   credentials:true}));
 
-// OAuth --
+// OAuth and others --
 app.use(
   cookieSession({
     maxAge: 30*24*60*60*1000,
@@ -52,3 +53,6 @@ app.listen(PORT, () => {
 
 const professeursRoutes = require('./routes/professeurRoutes');
 app.use('/professeurs', professeursRoutes);
+
+const calendarRoutes = require('./routes/calendarRoutes');
+app.use('/calendar', calendarRoutes);

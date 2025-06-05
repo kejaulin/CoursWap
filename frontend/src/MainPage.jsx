@@ -1,6 +1,9 @@
 import {useEffect, useState } from 'react';
+import { useAuth } from './component/AuthProvider';
 
-function MainPage({connexionId}){
+function MainPage(){
+
+    const { user, logout } = useAuth();
 
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [allCourses, setCourses] = useState([]);
@@ -10,8 +13,7 @@ function MainPage({connexionId}){
           .then(res => res.json())
           .then(data => setCourses(data.allCourses))
       }, []);
-
-    if (connexionId ==undefined){
+    if (!user){
         return(
         <div className="font-sans flex flex-col items-center">
             <section className="w-full h-50 mt-5 mb-1 flex items-center justify-center">

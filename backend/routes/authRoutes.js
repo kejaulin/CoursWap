@@ -10,4 +10,8 @@ router.post('/logout', authController.userLogout);
 
 router.get('/current_user', authController.getCurrentUser);
 
+router.post('/login', authController.userLocalLogin);
+
+router.post('/register', authController.userRegister);
+
 module.exports = router;
