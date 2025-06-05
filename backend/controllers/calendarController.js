@@ -1,16 +1,11 @@
 const moment = require('moment');
 const { google } = require('googleapis');
-
+const { getAuthorizedClient } = require('../services/googleAuthTokenRefresher');
 require('dotenv').config();
 
 exports.addGoogleCalendarEvent = async (req,res,next) =>{
     try{
-
-      const auth = new google.auth.OAuth2(
-        process.env.GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET
-      );
-      auth.setCredentials({ access_token: req.user.accessToken });
+      const auth = await getAuthorizedClient(req.user);
 
       const formData = req.body;
       // formData.disponibilites = "08:00 - 10:00" par ex.

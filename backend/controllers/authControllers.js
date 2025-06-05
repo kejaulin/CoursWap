@@ -6,7 +6,8 @@ const User = mongoose.model('users');
 exports.googleAuthenticate = (req,res,next) =>{
     try{
         passport.authenticate('google', {
-            scope: ['profile', 'email', 'https://www.googleapis.com/auth/calendar']
+            scope: ['profile', 'email', 'https://www.googleapis.com/auth/calendar'],
+            accessType: 'offline',
         })(req, res, next);
     } catch (err){
         next(err);
@@ -60,7 +61,11 @@ exports.userLocalLogin = (req,res,next) => {
     
 exports.userLogout = (req,res) =>{
     try{
-        req.logout()
+        req.logout(() => {
+            req.session.destroy(() => {
+                res.redirect('/');
+            });
+        });
         res.send(req.user);
     } catch (err){
         res.status(500).json({ error: err.message });   
