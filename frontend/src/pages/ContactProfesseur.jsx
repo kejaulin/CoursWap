@@ -1,13 +1,20 @@
-// frontend/src/pages/ContactProfesseur.jsx
 import { useParams } from 'react-router-dom';
 import '../style/style.css';
 import { useState, useEffect } from 'react';
-import { gapi } from 'gapi-script';
-import moment from 'moment';
-
-const clientId = import.meta.env.VITE_GCALENDAR_API_KEY;
+import { useAuth } from '../component/AuthProvider';
 
 function ContactProfesseur() {
+
+  const calendarActions = {
+    google: {
+      label: 'Ajouter à mon agenda Google',
+      endpoint: 'google'
+    },
+    local: {
+      label: 'Générer mon évènement calendrier',
+      endpoint: 'ical'
+    },
+  };
   const { id } = useParams(); 
 
   const [formData, setFormData] = useState({
@@ -15,12 +22,15 @@ function ContactProfesseur() {
     chapitres: '',
     disponibilites: '',
     mode: 'visio',
-    date: ''
+    date: '',
+    profId:id
   });
 
   // Etat pour stocker les données du prof récupérées dans le backend
   const [prof, setProf] = useState(null);
 
+  const { user, logout } = useAuth();
+  const provider = user?.authMethod || 'local';
   // Charger les infos du prof dès que "id" change
   useEffect(() => {
     fetch(`http://localhost:4000/professeurs/${id}`)
@@ -32,16 +42,6 @@ function ContactProfesseur() {
       .catch(err => console.error('Erreur de récupération du professeur :', err));
   }, [id]);
 
-  // Initialiser l’API Google Calendar
-  useEffect(() => {
-    gapi.load("client:auth2", () => {
-      gapi.client.init({
-        clientId,
-        scope: "https://www.googleapis.com/auth/calendar.events"
-      });
-    });
-  }, []);
-
   // Gestion des champs du formulaire
   const handleChange = (e) => {
     setFormData(prev => ({
@@ -50,41 +50,30 @@ function ContactProfesseur() {
     }));
   };
 
-  // Quand on clique sur « Envoyer la demande », on crée l’événement dans Google Calendar
+  // Quand on clique sur « Envoyer la demande », on crée l’événement dans le calendar
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!prof) return; // sécurité
 
     try {
-      const auth = gapi.auth2.getAuthInstance();
-      const user = await auth.signIn();
-      const accessToken = user.getAuthResponse().access_token;
-      gapi.client.setToken({ access_token: accessToken });
-      await gapi.client.load('calendar', 'v3');
-
-      // formData.disponibilites = "08:00 - 10:00" par ex.
-      const [startHour, endHour] = formData.disponibilites.split(' - ');
-      const startDateTime = moment(`${formData.date}T${startHour}`).toISOString();
-      const endDateTime   = moment(`${formData.date}T${endHour}`).toISOString();
-
-      const event = {
-        summary: `Cours de ${formData.chapitres} avec ${prof.nom}`,
-        description: `Cours pour la classe ${formData.classe}`,
-        start: {
-          dateTime: startDateTime,
-          timeZone: "Europe/Paris",
-        },
-        end: {
-          dateTime: endDateTime,
-          timeZone: "Europe/Paris",
-        },
-      };
-
-      await gapi.client.calendar.events.insert({
-        calendarId: 'primary',
-        resource: event,
+      const url = new URL(`api/calendar/${calendarActions[provider].endpoint || calendarActions.local.endpoint}`, window.location.origin);
+      fetch(url.href,{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(formData),
+      }).then(async (res) => {
+        if (res.ok){
+          const blob = await res.blob();
+          const url2 = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url2;
+          a.download = 'meetingInfos.ics';
+          a.click();
+          URL.revokeObjectURL(url2);
+          alert('Le rendez-vous a été ajouté à ton calendrier !');
+        }
       });
-      alert('Le rendez-vous a été ajouté dans ton Google Calendar !');
     } catch (error) {
       console.error("Erreur lors de l’insertion dans Calendar :", error);
       alert('Une erreur est survenue lors de la création du rendez-vous.');
@@ -99,13 +88,9 @@ function ContactProfesseur() {
   // Une fois prof chargé, on peut afficher la fiche + le formulaire
   return (
     <div className="contact-prof">
-      <header className="header">
-        <img src="../img/appLogo.png" alt="Courswap" className="logo" />
-      </header>
-
       <section className="prof-info">
         <img
-          src={prof.photo} alt={`Photo de ${prof.nom}`}bclassName="avatar"/>
+          src={prof.photo} alt={`Photo de ${prof.nom}`} className="avatar"/>
         <div>
           <h2>{prof.nom}</h2>
           <p>Professeur de {prof.matiere}</p>
@@ -185,7 +170,7 @@ function ContactProfesseur() {
           </div>
         )}
 
-        <button type="submit">Envoyer la demande</button>
+        <button type="submit">{calendarActions[provider].label || calendarActions.local.label}</button>
       </form>
     </div>
   );
