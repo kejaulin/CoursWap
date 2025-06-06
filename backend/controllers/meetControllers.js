@@ -50,3 +50,13 @@ exports.updateMeet = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+exports.reverseGeocode = async (req,res) =>{
+    try{
+        const {lat,lng} = req.body;
+        const address = await meetService.reverseGeocode(lat,lng);
+        res.send({address:address});
+    } catch (err){
+        res.status(500).json({ error: err.message });   
+    }
+}

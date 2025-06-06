@@ -5,7 +5,8 @@ const ProfesseurSchema = new mongoose.Schema({
   nom: { type: String, required: true },
   photo: { type: String }, 
   matiere: { type: String, required: true },
-  disponibilites: [String] 
+  disponibilites: [String],
+  meetingLocations: [{key:String, location: { lat: Number, lng: Number }}], 
 });
 
 module.exports = mongoose.model('professeurs', ProfesseurSchema);

@@ -76,6 +76,14 @@ const meetService = {
             resource: updates,
         });
         return updated.data;
+    },
+
+    async reverseGeocode(lat, lng) {
+        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.GMAP_PLATFORM_API_KEY}`;
+        const response = await fetch(geocodeUrl);
+        const data = await response.json();
+        const address = data.results[0]?.formatted_address;
+        return address;
     }
 };
 

@@ -4,7 +4,7 @@ const meetController = require('../controllers/meetControllers');
 
 /**
  * @swagger
- * /api/meetings:
+ * /meetings:
  *   post:
  *     summary: Créer une réunion Google Meet
  *     requestBody:
@@ -33,7 +33,7 @@ router.post('/', meetController.createMeet);
 
 /**
  * @swagger
- * /api/meetings:
+ * /meetings:
  *   get:
  *     summary: Liste toutes les réunions Google Meet
  *     responses:
@@ -44,7 +44,7 @@ router.get('/', meetController.listMeets);
 
 /**
  * @swagger
- * /api/meetings/{id}:
+ * /meetings/{id}:
  *   get:
  *     summary: Récupère une réunion par ID
  *     parameters:
@@ -61,7 +61,7 @@ router.get('/:id', meetController.getMeet);
 
 /**
  * @swagger
- * /api/meetings/{id}:
+ * /meetings/{id}:
  *   delete:
  *     summary: Supprime une réunion par ID
  *     parameters:
@@ -78,7 +78,7 @@ router.delete('/:id', meetController.deleteMeet);
 
 /**
  * @swagger
- * /api/meetings/{id}:
+ * /meetings/{id}:
  *   put:
  *     summary: Met à jour une réunion par ID
  *     parameters:
@@ -98,5 +98,29 @@ router.delete('/:id', meetController.deleteMeet);
  *         description: Réunion mise à jour
  */
 router.put('/:id', meetController.updateMeet);
+
+/**
+ * @swagger
+ * /meetings/reverse-geocode:
+ *   post:
+ *     summary: Récupère une adresse à partir d'une longitude et latitude
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               lat:
+ *                 type: number
+ *                 example: 48.2692
+ *               lng:
+ *                 type: number
+ *                 example: 4.0668
+ *     responses:
+ *       201:
+ *         description: Adresse postale
+ */
+router.post('/reverse-geocode', meetController.reverseGeocode);
 
 module.exports = router;

@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import '../style/style.css';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../component/AuthProvider';
+import GMAP from '../component/gMap';
 
 function ContactProfesseur() {
 
@@ -23,6 +24,7 @@ function ContactProfesseur() {
     disponibilites: '',
     mode: 'visio',
     date: '',
+    location:'',
     profId:id
   });
 
@@ -50,10 +52,18 @@ function ContactProfesseur() {
     }));
   };
 
+  const handleLocationSelected = (location) => {
+    setFormData(prev => ({
+      ...prev,
+      location: location.address
+    }));
+  };
+
   // Quand on clique sur « Envoyer la demande », on crée l’événement dans le calendar
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!prof) return; // sécurité
+    if(formData.mode === "presentiel" && formData.location == '') return alert('Veuillez choisir une adresse');
 
     try {
       const url = new URL(`api/calendar/${calendarActions[provider].endpoint || calendarActions.local.endpoint}`, window.location.origin);
@@ -133,7 +143,6 @@ function ContactProfesseur() {
           required
         />
 
-        {/* Disponibilité (options issues de prof.disponibilites) */}
         <label>Disponibilité (choisir un créneau) :</label>
         <select
           name="disponibilites"
@@ -142,10 +151,6 @@ function ContactProfesseur() {
           required
         >
           <option value="">-- Choisir un créneau --</option>
-          {/*
-            À la place d’un tableau « heures = [...] », on utilise
-            directement la liste du professeur : prof.disponibilites
-          */}
           {prof.disponibilites.map((creneau) => (
             <option key={creneau} value={creneau}>
               {creneau}
@@ -153,7 +158,6 @@ function ContactProfesseur() {
           ))}
         </select>
 
-        {/* Mode : visio / présentiel */}
         <label>Mode :</label>
         <select
           name="mode"
@@ -161,15 +165,11 @@ function ContactProfesseur() {
           onChange={handleChange}
         >
           <option value="visio">Visioconférence</option>
-          <option value="presentiel">Présentiel</option>
+          {prof.meetingLocations.length > 0 && <option value="presentiel">Présentiel</option> }
         </select>
 
-        {/* Si présentiel est sélectionné, on affiche la carte */}
         {formData.mode === "presentiel" && (
-          <div className="map-container">
-            <p>Carte Google Maps à afficher ici (lieu du cours)</p>
-            <div className="map-placeholder"></div>
-          </div>
+            <GMAP infoType='prof' poiMarkersList={prof.meetingLocations} onLocationSelect={handleLocationSelected}/>
         )}
 
         <button type="submit">{calendarActions[provider].label || calendarActions.local.label}</button>

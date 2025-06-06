@@ -21,7 +21,7 @@ exports.addGoogleCalendarEvent = async (req,res,next) =>{
         return res.json();
       })
 
-      const event = {
+      let event = {
         summary: `Cours de ${formData.chapitres} avec ${prof.nom}`,
         description: `Cours pour la classe ${formData.classe}`,
         start: {
@@ -33,9 +33,9 @@ exports.addGoogleCalendarEvent = async (req,res,next) =>{
           timeZone: "Europe/Paris",
         },
       };
-      
-      const calendar = google.calendar({version: 'v3',auth:auth});
+      if(formData.location && formData.location.address !== '') event.location = formData.location.address;
 
+      const calendar = google.calendar({version: 'v3',auth:auth});
       calendar.events.insert({
             calendarId: 'primary',
             resource: event,
@@ -66,10 +66,12 @@ exports.addIcalEvent = async (req,res,next) =>{
           title: `Cours de ${formData.chapitres} avec ${prof.nom}`,
           description: `Cours pour la classe ${formData.classe}`,
           start:[2025, 6,12,14,0],
-          location: 'Jitsi Online meeting',
           url: 'http://localhost:3000',
           organizer:{ name: 'CoursWap'},
         };
+        if(formData.mode === 'presentiel') {
+          if(formData.location && formData.location.address !== '') event.location = formData.location.address;
+        } else if(formData.mode === 'visio') event.location = 'Jitsi Online meeting';
 
         createEvent(event,(error,value)=>{
           if(error) return res.status(500).send('Failed to generate iCal Event.');

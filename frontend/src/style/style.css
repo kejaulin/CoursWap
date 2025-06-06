@@ -86,7 +86,7 @@
 }
 
 /* Bouton */
-.formulaire button {
+.formulaire > button {
   margin-top: 1rem;
   background-color: #6842B9;
   color: #fff;
@@ -98,7 +98,7 @@
   transition: background-color 0.3s ease;
 }
 
-.formulaire button:hover {
+.formulaire > button:hover {
   background-color: #5734a0;
 }
 
