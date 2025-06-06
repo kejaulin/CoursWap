@@ -53,8 +53,8 @@ exports.addIcalEvent = async (req,res,next) =>{
         const formData = req.body;
 
         const [startHour, endHour] = formData.disponibilites.split(' - ');
-        const startDateTime = moment(`${formData.date}T${startHour}`).toISOString();
-        const endDateTime   = moment(`${formData.date}T${endHour}`).toISOString();
+        const startDateTime = moment(`${formData.date}T${startHour}`);
+        const durationMs =  moment.duration(moment(`${formData.date}T${endHour}`).diff(startDateTime));
         
         const prof = await fetch(`http://localhost:4000/professeurs/${formData.profId}`)
         .then(res => {
@@ -65,9 +65,11 @@ exports.addIcalEvent = async (req,res,next) =>{
         const event = {
           title: `Cours de ${formData.chapitres} avec ${prof.nom}`,
           description: `Cours pour la classe ${formData.classe}`,
-          start:[2025, 6,12,14,0],
+          start:[startDateTime.year(),startDateTime.month()+1,startDateTime.date(),startDateTime.hour(),startDateTime.minute()], //[YYYY, M, D, H, M]
           url: 'http://localhost:3000',
           organizer:{ name: 'CoursWap'},
+          startOutputType: 'local',
+          duration:{ hours: durationMs.hours(), minutes: durationMs.minutes() },
         };
         if(formData.mode === 'presentiel') {
           if(formData.location && formData.location.address !== '') event.location = formData.location.address;
