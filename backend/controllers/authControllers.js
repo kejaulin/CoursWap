@@ -5,6 +5,7 @@ const User = mongoose.model('users');
 
 exports.googleAuthenticate = (req,res,next) =>{
     try{
+        console.log('Google authentication initiated');
         passport.authenticate('google', {
             scope: ['profile', 'email', 'https://www.googleapis.com/auth/calendar'],
             accessType: 'offline',
