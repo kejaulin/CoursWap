@@ -7,7 +7,12 @@ const userSchema = new Schema({
     refreshToken: String, // long-live, used to get new access token
     email: String,
     password: String,
-    authMethod: String
+    authMethod: String,
+    nom: String, 
+    role: { type: String, enum: ['etudiant', 'professeur'], required: true }, 
+    matiere: String, 
+    disponibilites: Array, 
+    photo: String, 
 });
 
-mongoose.model('users',userSchema);
+module.exports = mongoose.model('users',userSchema);

@@ -17,6 +17,8 @@ const meetRoutes = require('./routes/meetRoutes');
 const PORT = process.env.SERVER_PORT;
 
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const professeursRoutes = require('./routes/professeurRoutes');
 
 mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
     console.log('Connected to MongoDB.');
@@ -66,7 +68,7 @@ app.use('/meetings', meetRoutes);
 
 
 app.get('/courses', (req, res) => {
-  res.send({'allCourses':["Maths","Français","Physique","Chimie"]});
+  res.send({'allCourses':["Mathématiques","Français","Physique","Chimie"]});
 });
 
 app.listen(PORT, () => {
@@ -74,8 +76,13 @@ app.listen(PORT, () => {
   console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
 }); 
 
-const professeursRoutes = require('./routes/professeurRoutes');
+
 app.use('/professeurs', professeursRoutes);
+
+
+app.use('/users', userRoutes);
+//app.use('/uploads', express.static('uploads'));
+
 
 const calendarRoutes = require('./routes/calendarRoutes');
 app.use('/calendar', calendarRoutes);
