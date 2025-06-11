@@ -58,7 +58,7 @@ function ContactProfesseur() {
   const provider = user?.authMethod || 'local';
   // Charger les infos du prof dès que "id" change
   useEffect(() => {
-    fetch(`http://localhost:4000/professeurs/${id}`)
+    fetch(`http://localhost:4000/users/${id}`)
       .then(res => {
         if (!res.ok) throw new Error("404");
         return res.json();
@@ -70,7 +70,7 @@ function ContactProfesseur() {
   // Gestion des champs du formulaire
   const handleChange = (e) => {
     setFormData(prev => ({
-      ...prev,
+      ...prev, profId: id, 
       [e.target.name]: e.target.value
     }));
   };
@@ -85,39 +85,39 @@ function ContactProfesseur() {
   // Quand on clique sur « Envoyer la demande », on crée l’événement dans le calendar
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    
     if (!prof) return; // sécurité
 
     try {
-      const auth = gapi.auth2.getAuthInstance();
-      const user = await auth.signIn();
-      const accessToken = user.getAuthResponse().access_token;
-      gapi.client.setToken({ access_token: accessToken });
-      await gapi.client.load('calendar', 'v3');
+     
+      // Extraction date et heure
+    const [date, creneau] = formData.disponibilites.split(' '); // ex: "10/06/2025 08:00-10:00"
+    
+    // Convertir date au format ISO 
+    function convertDateToISO(dateStr) {
+      const [day, month, year] = dateStr.split('/');
+      return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
+    }
+    const dateISO = convertDateToISO(date);
 
-      // formData.disponibilites = "08:00 - 10:00" par ex.
-      const [startHour, endHour] = formData.disponibilites.split(' - ');
-      const startDateTime = moment(`${formData.date}T${startHour}`).toISOString();
-      const endDateTime   = moment(`${formData.date}T${endHour}`).toISOString();
+    // Génération d’un meetingId (ici un simple UUID temporaire)
+    const meetingId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
 
-      const event = {
-        summary: `Cours de ${formData.chapitres} avec ${prof.nom}`,
-        description: `Cours pour la classe ${formData.classe}`,
-        start: {
-          dateTime: startDateTime,
-          timeZone: "Europe/Paris",
-        },
-        end: {
-          dateTime: endDateTime,
-          timeZone: "Europe/Paris",
-        },
-      };
+    // Construire l’objet meeting à envoyer
+    const meetingData = {
+      studentId: user._id,
+      profId: formData.profId,
+      meetingId,
+      date: dateISO,
+      heure: creneau, // ex: "08:00-10:00"
+      mode: formData.mode,
+      lieu: formData.lieu || null,
+      chapitres: formData.chapitres,
+      classe: formData.classe,
+    };
 
-      await gapi.client.calendar.events.insert({
-        calendarId: 'primary',
-        resource: event,
-      });
-      alert('Le rendez-vous a été ajouté dans ton Google Calendar !');
-            setShowForm(false); // ferme le formulaire
+      // Envoi de l’événement au calendrier
       const url = new URL(`api/calendar/${calendarActions[provider].endpoint || calendarActions.local.endpoint}`, window.location.origin);
       fetch(url.href,{
         method: 'POST',
@@ -138,6 +138,40 @@ function ContactProfesseur() {
           alert('Le rendez-vous a été ajouté à ton calendrier !');
         }
       });
+      
+    //Création du meeting en base
+    const meetingRes = await fetch('/api/meetings/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(meetingData),
+    });
+
+    if (!meetingRes.ok) throw new Error('Erreur lors de la création du meeting');
+
+     
+  // Suppression du créneau réservé dans les dispos du prof
+  const dispoRes = await fetch(`/api/users/${formData.profId}/disponibilites`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ date, creneau }),
+  });
+
+  if (!dispoRes.ok) throw new Error('Erreur lors de la mise à jour des disponibilités');
+
+  const dispoData = await dispoRes.json();
+  console.log(dispoData)
+
+  // Mettre à jour localement les dispos
+  setProf(prev => ({
+    ...prev,
+    disponibilites: dispoData.disponibilites,
+  }));
+  
+ 
+  setShowForm(false);
+ 
     } catch (error) {
       console.error("Erreur lors de l’insertion dans Calendar :", error);
       alert('Une erreur est survenue lors de la création du rendez-vous.');
@@ -193,16 +227,6 @@ function ContactProfesseur() {
             onClick={() => setShowForm(false)}
             aria-label="Fermer"
           >&times;</button>
-          
-       <label className="font-semibold">Date :</label>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            required
-            className="border rounded-lg p-2"
-          />
 
          <label className="font-semibold">Classe :</label>
           <input
@@ -236,9 +260,18 @@ function ContactProfesseur() {
             className="border rounded-lg p-2"
           >
           <option value="">-- Choisir un créneau --</option>
-          {prof.disponibilites.map((creneau) => (
-            <option key={creneau} value={creneau}>
-              {creneau}
+          {/*
+            À la place d’un tableau « heures = [...] », on utilise
+            directement la liste du professeur : prof.disponibilites
+          */}
+          {prof.disponibilites?.flatMap(d =>
+            d.creneaux.map(c => ({
+              date: d.date,
+              creneau: c
+            }))
+          ).map(({ date, creneau }) => (
+            <option key={`${date}-${creneau}`} value={`${date} ${creneau}`}>
+              {`${date} : ${creneau}`}
             </option>
           ))}
         </select>

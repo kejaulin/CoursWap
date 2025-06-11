@@ -19,6 +19,7 @@ const PORT = process.env.SERVER_PORT;
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const professeursRoutes = require('./routes/professeurRoutes');
+const meetingRoutes = require('./routes/meetingRoutes');
 
 mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
     console.log('Connected to MongoDB.');
@@ -82,6 +83,8 @@ app.use('/professeurs', professeursRoutes);
 
 app.use('/users', userRoutes);
 //app.use('/uploads', express.static('uploads'));
+
+app.use('/meetings', meetingRoutes );
 
 
 const calendarRoutes = require('./routes/calendarRoutes');

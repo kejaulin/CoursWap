@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import moment from "moment";
 import { useAuth } from "../component/AuthProvider";
 import { toast, ToastContainer } from 'react-toastify';
+import EspaceProf from '../component/EspaceProf'; 
+import EspaceEtu from '../component/EspaceEtu'; 
 
 function ProfilPage() {
   const [role, setRole] = useState(""); // 'etudiant' ou 'professeur'
@@ -21,8 +23,8 @@ function ProfilPage() {
   const { user } = useAuth();
   const [profilCree, setProfilCree] = useState(false);
   const [profil, setProfil] = useState(null);
-    const [showProfForm, setShowProfForm] = useState(false);
-
+  const [showProfForm, setShowProfForm] = useState(false);
+  const [meetings, setMeetings] = useState([]);
 
 //charger les matières disponibles depuis l'API
 useEffect(() => {
@@ -55,6 +57,20 @@ useEffect(() => {
       .finally(() => setLoading(false));
   }, []);
 
+  // Charger les réunions de l'utilisateur connecté
+useEffect(() => {
+  fetch('/api/meetings/my-meetings', {
+    credentials: 'include',
+  })
+    .then(res => res.json())
+    .then(data => {
+      setMeetings(data);
+      setLoading(false);
+    })
+    .catch(() => setLoading(false));
+}, [user]);  
+
+  
 
   // Créneaux fixes à cocher
   const allCreneaux = ["08:00-10:00", "10:00-12:00", "14:00-16:00", "16:00-18:00"];
@@ -122,6 +138,10 @@ const toggleCreneau = (dayIdx, creneau) => {
   };
   if (loading) return <div>Chargement…</div>;
 
+
+
+
+
   const ProfForm = (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div>
@@ -187,6 +207,7 @@ const toggleCreneau = (dayIdx, creneau) => {
   // Formulaire étudiant initial
   const EtudiantForm = (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <h2 className="text-2xl font-bold mb-6 text-purple-700">Créer mon profil</h2>
       <div>
         <label className="block font-semibold mb-2">Je suis :</label>
         <div className="flex gap-6">
@@ -219,42 +240,40 @@ const toggleCreneau = (dayIdx, creneau) => {
     </form>
   );
 
+  
 return (
    <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-8 mt-8">
       <ToastContainer />
-      <h2 className="text-2xl font-bold mb-6 text-purple-700">Créer mon profil</h2>
+    
       {!profilCree || showProfForm ? (
         // Formulaire conditionnel : Étudiant, Professeur ou évolution "Devenir professeur"
         role === "professeur" || showProfForm ? ProfForm : EtudiantForm
       ) : (
+        
         <>
+        
           {role === "professeur" ? (
-            <EspaceProf
-              nom={nom || (profil && profil.nom)}
-              disponibilites={dispos}
-              onEdit={() => setShowProfForm(true)}
-              onRetourAccueil={() => window.location.href = "/"}
-            />
+            
+          <EspaceProf
+  nom={nom || (profil && profil.nom)}
+  disponibilites={dispos}
+  onEdit={() => setShowProfForm(true)}
+  onRetourAccueil={() => window.location.href = "/"}
+  meetings={meetings}
+  user={user}
+/>
           ) : (
-            <div>
-              <h3 className="text-xl font-bold text-purple-700 mb-4">Salut {nom} !</h3>
-              <p>Ton profil étudiant est prêt. Bienvenue sur la plateforme !</p>
-              <button
-                className="bg-purple-500 text-white py-2 px-8 rounded-xl font-semibold hover:bg-purple-600"
-                onClick={() => window.location.href = "/"}
-              >
-                Aller à l'accueil
-              </button>
-              <button
-                className="mt-3 bg-green-500 text-white py-2 px-6 rounded-xl font-semibold hover:bg-green-600"
-                onClick={() => {
-                  setRole("professeur");
-                  setShowProfForm(true);
-                }}
-              >
-                Devenir professeur
-              </button>
-            </div>
+            <EspaceEtu 
+            onDevenirProf={() => {
+              setRole("professeur");
+              setShowProfForm(true);
+            }}
+            nom={nom || (profil && profil.nom)}
+            meetings={meetings}
+            user={user}
+/>
+
+            
           )}
         </>
       )}
@@ -262,33 +281,6 @@ return (
   );
 }
 
-// Composant "Espace Prof"
-function EspaceProf({ nom, disponibilites, onEdit, onRetourAccueil }) {
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <h3 className="text-xl font-bold text-purple-700 mb-4">Bienvenue, {nom} !</h3>
-      <p className="mb-2">Tu es maintenant professeur.<br />Voici un résumé de tes disponibilités :</p>
-      <div className="mb-2">
-        {disponibilites.slice(0, 7).map(d =>
-          <div key={d.date} className="text-sm">
-            {d.date} : {d.creneaux.length ? d.creneaux.join(", ") : "Aucun créneau"}
-          </div>
-        )}
-      </div>
-      <button
-        className="bg-purple-500 text-white py-2 px-8 rounded-xl font-semibold hover:bg-purple-600"
-        onClick={onEdit}
-      >
-        Modifier mes disponibilités
-      </button>
-      <button
-        className="mt-2 text-gray-600 underline"
-        onClick={onRetourAccueil}
-      >
-        Retour à l'accueil
-      </button>
-    </div>
-  );
 
-}
+
 export default ProfilPage ; 

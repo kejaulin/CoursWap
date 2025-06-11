@@ -17,7 +17,7 @@ function MainPage(){
           .then(res => res.json())
           .then(data => setCourses(data.allCourses));
 
-        fetch('/api/professeurs')
+        fetch('/api/users')
             .then(res => res.json())
             .then(data => setAllProfesseurs(data))
       }, []);
