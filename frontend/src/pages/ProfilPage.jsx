@@ -6,7 +6,6 @@ import EspaceProf from '../component/EspaceProf';
 import EspaceEtu from '../component/EspaceEtu'; 
 
 function ProfilPage() {
-  const [role, setRole] = useState(""); // 'etudiant' ou 'professeur'
   const [nom, setNom] = useState("");
   const [matiere, setMatiere] = useState("");
   const [photo, setPhoto] = useState(null);
@@ -24,75 +23,74 @@ function ProfilPage() {
   const [profilCree, setProfilCree] = useState(false);
   const [profil, setProfil] = useState(null);
   const [showProfForm, setShowProfForm] = useState(false);
+  const [role, setRole] = useState(user.role); // 'etudiant' ou 'professeur'
   const [meetings, setMeetings] = useState([]);
 
-//charger les matières disponibles depuis l'API
-useEffect(() => {
-  fetch('/api/courses')
-    .then(res => res.json())
-    .then(data => setAllCourses(data.allCourses));
-}, []);
 
-// Charger le profil utilisateur si déjà connecté
-useEffect(() => {
-  fetch("/api/users/me", { credentials: "include" })
-    .then(res => res.json())
-    .then(data => {
-         console.log("user connecté:", data);
-         setProfil(data);
-         setLoading(false);
-      // Si profil déjà créé (nom ET role présents), => pas de form
-      if (data && data.role && data.nom) {
-        setRole(data.role);
-        setNom(data.nom);
-        setMatiere(data.matiere || "");
-        // Si le profil est professeur, on charge les disponibilités
-        if (data.role === "professeur" && data.disponibilites) {
-          setDispos(data.disponibilites);
-          }
-          setProfilCree(true);
-        }
-      })
-    
-      .finally(() => setLoading(false));
+  //charger les matières disponibles depuis l'API
+  useEffect(() => {
+    fetch('/api/courses')
+      .then(res => res.json())
+      .then(data => setAllCourses(data.allCourses));
   }, []);
 
-  // Charger les réunions de l'utilisateur connecté
-useEffect(() => {
-  fetch('/api/meetings/my-meetings', {
-    credentials: 'include',
-  })
-    .then(res => res.json())
-    .then(data => {
-      setMeetings(data);
-      setLoading(false);
-    })
-    .catch(() => setLoading(false));
-}, [user]);  
+  // Charger le profil utilisateur si déjà connecté
+  useEffect(() => {
+    fetch("/api/users/me", { credentials: "include" })
+      .then(res => res.json())
+      .then(data => {
+          console.log("user connecté:", data);
+          setProfil(data);
+          setLoading(false);
+        // Si profil déjà créé (nom ET role présents), => pas de form
+        if (data && data.role && data.nom) {
+          setRole(data.role);
+          setNom(data.nom);
+          setMatiere(data.matiere || "");
+          // Si le profil est professeur, on charge les disponibilités
+          if (data.role === "professeur" && data.disponibilites) {
+            setDispos(data.disponibilites);
+            }
+            setProfilCree(true);
+          }
+        })
+      
+        .finally(() => setLoading(false));
+    }, []);
 
-  
+    // Charger les réunions de l'utilisateur connecté
+  useEffect(() => {
+    fetch('/api/meetings/my-meetings', {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(data => {
+        setMeetings(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [user]);  
 
   // Créneaux fixes à cocher
   const allCreneaux = ["08:00-10:00", "10:00-12:00", "14:00-16:00", "16:00-18:00"];
 
-
   // Pour cocher/décocher un créneau
-const toggleCreneau = (dayIdx, creneau) => {
-  setDispos(prev => {
-    const copy = [...prev];
-    const creneauxDuJour = new Set(copy[dayIdx].creneaux);
-    if (creneauxDuJour.has(creneau)) {
-      creneauxDuJour.delete(creneau);
-    } else {
-      creneauxDuJour.add(creneau);
-    }
-    copy[dayIdx] = {
-      ...copy[dayIdx],
-      creneaux: Array.from(creneauxDuJour)
-    };
-    return copy;
-  });
-};
+  const toggleCreneau = (dayIdx, creneau) => {
+    setDispos(prev => {
+      const copy = [...prev];
+      const creneauxDuJour = new Set(copy[dayIdx].creneaux);
+      if (creneauxDuJour.has(creneau)) {
+        creneauxDuJour.delete(creneau);
+      } else {
+        creneauxDuJour.add(creneau);
+      }
+      copy[dayIdx] = {
+        ...copy[dayIdx],
+        creneaux: Array.from(creneauxDuJour)
+      };
+      return copy;
+    });
+  };
 
   // Quand on choisit une photo
   const handlePhoto = e => {
@@ -137,10 +135,6 @@ const toggleCreneau = (dayIdx, creneau) => {
     setLoading(false);
   };
   if (loading) return <div>Chargement…</div>;
-
-
-
-
 
   const ProfForm = (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -212,11 +206,11 @@ const toggleCreneau = (dayIdx, creneau) => {
         <label className="block font-semibold mb-2">Je suis :</label>
         <div className="flex gap-6">
           <label className="flex items-center gap-2">
-            <input type="radio" name="role" value="etudiant" checked={role === "etudiant"} onChange={e => setRole(e.target.value)} />
+            <input type="radio" name="role" value="etudiant" checked={user.role === "etudiant"} onChange={e => setRole(e.target.value)} />
             Étudiant
           </label>
           <label className="flex items-center gap-2">
-            <input type="radio" name="role" value="professeur" checked={role === "professeur"} onChange={e => setRole(e.target.value)} />
+            <input type="radio" name="role" value="professeur" checked={user.role === "professeur"} onChange={e => setRole(e.target.value)} />
             Professeur
           </label>
         </div>
@@ -240,47 +234,40 @@ const toggleCreneau = (dayIdx, creneau) => {
     </form>
   );
 
-  
 return (
-   <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-8 mt-8">
-      <ToastContainer />
+  <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-8 mt-8">
+    <ToastContainer />
     
-      {!profilCree || showProfForm ? (
-        // Formulaire conditionnel : Étudiant, Professeur ou évolution "Devenir professeur"
-        role === "professeur" || showProfForm ? ProfForm : EtudiantForm
+    {!profilCree || showProfForm ? (
+      // Formulaire conditionnel : Étudiant, Professeur ou évolution "Devenir professeur"
+      role === "professeur" || showProfForm ? ProfForm : EtudiantForm
+    ) : (    
+    <>    
+      {role === "professeur" ? (      
+        <EspaceProf
+          nom={nom || (profil && profil.nom)}
+          disponibilites={dispos}
+          onEdit={() => setShowProfForm(true)}
+          onRetourAccueil={() => window.location.href = "/"}
+          meetings={meetings}
+          user={user}
+        />
       ) : (
-        
-        <>
-        
-          {role === "professeur" ? (
-            
-          <EspaceProf
-  nom={nom || (profil && profil.nom)}
-  disponibilites={dispos}
-  onEdit={() => setShowProfForm(true)}
-  onRetourAccueil={() => window.location.href = "/"}
-  meetings={meetings}
-  user={user}
-/>
-          ) : (
-            <EspaceEtu 
-            onDevenirProf={() => {
-              setRole("professeur");
-              setShowProfForm(true);
-            }}
-            nom={nom || (profil && profil.nom)}
-            meetings={meetings}
-            user={user}
-/>
-
-            
-          )}
-        </>
+        <EspaceEtu 
+        onDevenirProf={() => {
+          setRole("professeur");
+          setShowProfForm(true);
+        }}
+        nom={nom || (profil && profil.nom)}
+        meetings={meetings}
+        user={user}
+        />     
       )}
-    </div>
-  );
+    </>
+    )}
+  </div>
+);
+
 }
-
-
 
 export default ProfilPage ; 

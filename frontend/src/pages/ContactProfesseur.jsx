@@ -1,6 +1,6 @@
 
 
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../component/AuthProvider';
@@ -30,6 +30,7 @@ function ContactProfesseur() {
     location:'',
     profId:id
   });
+  const navigate = useNavigate();
 
 //  Definition des video de demo 
   const videosDemo = [
@@ -92,30 +93,30 @@ function ContactProfesseur() {
     try {
      
       // Extraction date et heure
-    const [date, creneau] = formData.disponibilites.split(' '); // ex: "10/06/2025 08:00-10:00"
-    
-    // Convertir date au format ISO 
-    function convertDateToISO(dateStr) {
-      const [day, month, year] = dateStr.split('/');
-      return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
-    }
-    const dateISO = convertDateToISO(date);
+      const [date, creneau] = formData.disponibilites.split(' '); // ex: "10/06/2025 08:00-10:00"
+      
+      // Convertir date au format ISO 
+      function convertDateToISO(dateStr) {
+        const [day, month, year] = dateStr.split('/');
+        return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
+      }
+      const dateISO = convertDateToISO(date);
 
-    // Génération d’un meetingId (ici un simple UUID temporaire)
-    const meetingId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+      // Génération d’un meetingId (ici un simple UUID temporaire)
+      const meetingId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
 
-    // Construire l’objet meeting à envoyer
-    const meetingData = {
-      studentId: user._id,
-      profId: formData.profId,
-      meetingId,
-      date: dateISO,
-      heure: creneau, // ex: "08:00-10:00"
-      mode: formData.mode,
-      lieu: formData.lieu || null,
-      chapitres: formData.chapitres,
-      classe: formData.classe,
-    };
+      // Construire l’objet meeting à envoyer
+      const meetingData = {
+        studentId: user._id,
+        profId: formData.profId,
+        meetingId,
+        date: dateISO,
+        heure: creneau, // ex: "08:00-10:00"
+        mode: formData.mode,
+        lieu: formData.lieu || null,
+        chapitres: formData.chapitres,
+        classe: formData.classe,
+      };
 
       // Envoi de l’événement au calendrier
       const url = new URL(`api/calendar/${calendarActions[provider].endpoint || calendarActions.local.endpoint}`, window.location.origin);
@@ -209,12 +210,22 @@ function ContactProfesseur() {
             Passionné par l’enseignement, {prof.nom} aide les élèves à reprendre confiance et à maîtriser leurs bases.
           </p>
         </div>
-          {!showForm && (
-          <button
-            onClick={() => setShowForm(v => !v)}
-            className="ml-0 md:ml-8 bg-purple-400 hover:bg-purple-500 text-white font-bold py-3 px-7 rounded-2xl text-lg shadow transition"
-          >Prendre contact</button>
-        )}
+          {user._id === id ? (
+            <button
+                onClick={() => navigate('/profil')}
+                className="ml-0 md:ml-8 bg-purple-400 hover:bg-purple-500 text-white font-bold py-3 px-7 rounded-2xl text-lg shadow transition"
+              > Voir mon profil
+              </button>
+          ) : (
+            !showForm && (
+              <button
+                onClick={() => setShowForm(v => !v)}
+                className="ml-0 md:ml-8 bg-purple-400 hover:bg-purple-500 text-white font-bold py-3 px-7 rounded-2xl text-lg shadow transition"
+              > Prendre contact
+              </button>
+            )
+          )}
+          
       </section>
         {showForm && (
         <form

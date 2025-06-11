@@ -9,7 +9,7 @@ const userSchema = new Schema({
     password: String,
     authMethod: String,
     nom: String, 
-    role: { type: String, enum: ['etudiant', 'professeur'], required: true }, 
+    role: { type: String, enum: ['etudiant', 'professeur'] }, 
     matiere: String, 
     disponibilites: Array, 
     photo: String, 

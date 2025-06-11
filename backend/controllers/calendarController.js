@@ -51,9 +51,9 @@ const endDateTime = moment(`${isoDate}T${endHour}:00`).toISOString();
       calendar.events.insert({
             calendarId: 'primary',
             resource: event,
-        });
+      });
 
-        res.send({success: true});
+      res.send({success: true});
     } catch (err){
         next(err);
         res.status(500).json({ error: err.message });   
