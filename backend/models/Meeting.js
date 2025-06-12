@@ -21,4 +21,4 @@ const meetingSchema = new Schema({
 
     });
 
-module.exports = mongoose.model('Meeting', meetingSchema);
+module.exports = mongoose.model('MeetingTemp', meetingSchema);

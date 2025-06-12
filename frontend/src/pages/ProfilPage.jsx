@@ -60,7 +60,7 @@ function ProfilPage() {
 
     // Charger les réunions de l'utilisateur connecté
   useEffect(() => {
-    fetch('/api/meetings/my-meetings', {
+    fetch('/api/meetingstemp/my-meetings', {
       credentials: 'include',
     })
       .then(res => res.json())

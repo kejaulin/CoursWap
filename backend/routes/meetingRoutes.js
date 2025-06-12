@@ -42,13 +42,8 @@ router.get('/my-meetings', async (req, res) => {
         { etudiantId: userId },
         { profId: userId }
       ]
-    })
-    //test
-    .populate('profId', 'nom')      
-    .populate('etudiantId', 'nom')  
-    .lean()
-    .sort({ date: 1 }); // tri par date croissante
-     res.json(meetings);
+    }).sort({ date: 1 });  // tri par date croissante
+    res.json(meetings);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

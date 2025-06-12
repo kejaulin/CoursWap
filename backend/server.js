@@ -84,7 +84,7 @@ app.use('/professeurs', professeursRoutes);
 app.use('/users', userRoutes);
 //app.use('/uploads', express.static('uploads'));
 
-app.use('/meetings', meetingRoutes );
+app.use('/meetingstemp', meetingRoutes );
 
 
 const calendarRoutes = require('./routes/calendarRoutes');

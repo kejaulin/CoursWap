@@ -12,7 +12,7 @@ const PoiMarkers = ({props, onLocationSelect}) => {
         if(!ev.location) return;
         setSelectedMarker(ev);
         map.panTo(ev.location);
-        fetch('/api/meetings/reverse-geocode', {
+        fetch('/api/meetingstemp/reverse-geocode', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(ev.location),
