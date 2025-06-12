@@ -62,7 +62,7 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use('/api/meetings', meetRoutes);
+app.use('/meetings', meetRoutes);
 
 
 app.get('/courses', (req, res) => {
