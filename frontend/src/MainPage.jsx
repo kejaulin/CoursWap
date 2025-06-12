@@ -7,12 +7,21 @@ function MainPage(){
 
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [allCourses, setCourses] = useState([]);
+    const [meetings, setMeetings] = useState([]);
+
 
     useEffect(() => {
         fetch('/api/courses')
           .then(res => res.json())
           .then(data => setCourses(data.allCourses))
       }, []);
+
+    useEffect(() => {
+        fetch('/api/meetings')
+            .then(res => res.json())
+            .then(data => setMeetings(data));
+    }, []);
+
     if (!user){
         return(
         <div className="font-sans flex flex-col items-center">
@@ -38,6 +47,11 @@ function MainPage(){
         </div>
         )   
     }
+
+    const filteredMeetings = selectedSubject
+        ? meetings.filter(meet => meet.summary === selectedSubject)
+        : [];
+        
     return(
     <div className="font-sans flex flex-col items-center">
         <section className="bg-purple-200 rounded-3xl p-6 m-4 mb-0.5 flex flex-col md:flex-row items-center justify-left w-9/10 space-x-2">
@@ -55,6 +69,29 @@ function MainPage(){
             </section>
             <section className="bg-purple-200 rounded-3xl p-6 m-4 mb-0.5 flex flex-col items-flex-start justify-left w-full">
                 <h4 className="text-2xl font-semibold mb-4">Les lives de {selectedSubject} en cours &#8680;</h4>
+                <ul>
+                            {filteredMeetings.length === 0 && (
+                                <li>Aucun live en cours pour ce thème.</li>
+                            )}
+                            {filteredMeetings.map(meet => (
+                                <li key={meet._id} className="mb-2">
+                                    <img src="" alt="" />
+                                    <span className="font-bold">{meet.summary}</span>
+                                    {" — "}
+                                    <a
+                                        href={meet.hangoutLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 underline"
+                                    >
+                                        Rejoindre le live
+                                    </a>
+                                    {" ("}
+                                    {new Date(meet.startDateTime).toLocaleString()} - {new Date(meet.endDateTime).toLocaleString()}
+                                    {")"}
+                                </li>
+                            ))}
+                        </ul>
             </section>
         </div>
         )}

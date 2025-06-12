@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ContactProfesseur from './pages/ContactProfesseur';import Header from './Header';
 import MainPage from './MainPage';
 import LoginRegister from './pages/LoginRegister';
+import CreateMeetingPage from './pages/CreateMeetingPage';
 import { useAuth } from './component/AuthProvider';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Routes>
             <Route path="/" element={<MainPage/>} />
             <Route path="/profs/:id" element={<ContactProfesseur />} />
+            <Route path="/creer-meeting" element={<CreateMeetingPage />} />
           </Routes>
         :
         <Routes>
