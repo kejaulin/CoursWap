@@ -4,7 +4,6 @@ const Meeting = require('../models/Meet');
 
 exports.createMeet = async (req, res) => {
     try {
-        console.log('Requête reçue pour création de meeting :', req.user);
         const { summary, startDateTime, endDateTime } = req.body;
         if (!summary || !startDateTime || !endDateTime) {
             return res.status(400).json({ error: "Tous les champs sont obligatoires." });
