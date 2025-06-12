@@ -1,23 +1,33 @@
-import { useEffect, useState, StrictMode } from 'react';
+import { StrictMode, useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ContactProfesseur from './pages/ContactProfesseur';
+import Header from './Header';
+import MainPage from './MainPage';
+import LoginRegister from './pages/LoginRegister';
+import QuizManager from './pages/QuizManager';
+import { useAuth } from './component/AuthProvider';
 
-
-const service = process.env.DOMAIN+'/app';
 function App() {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch(`${service}`)
-      .then(res => res.json())
-      .then(data => setMessage(data.temp));
-  }, []);
+  const { user, logout } = useAuth();
 
   return (
     <StrictMode>
-      <div>
-        <h1>test1133223</h1>
-        <h2>{message}</h2>
-      </div>
-    </StrictMode> 
+      <Header/>
+      <BrowserRouter>
+        { user ?
+          <Routes>
+            <Route path="/" element={<MainPage/>} />
+            <Route path="/profs/:id" element={<ContactProfesseur />} />
+            <Route path="/quiz-manager" element={<QuizManager />} />
+          </Routes>
+        :
+        <Routes>
+          <Route path="/loginPage" element={<LoginRegister />} />
+          <Route path="*" element={window.location.pathname !== "/loginPage" ? <MainPage/> : <div />} />
+        </Routes>
+        }
+      </BrowserRouter>
+    </StrictMode>
   );
 }
 
