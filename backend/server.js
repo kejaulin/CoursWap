@@ -79,3 +79,6 @@ app.use('/professeurs', professeursRoutes);
 
 const calendarRoutes = require('./routes/calendarRoutes');
 app.use('/calendar', calendarRoutes);
+
+const wordCloudRoutes = require('./routes/wordCloudRoutes');
+app.use('/wordcloud', wordCloudRoutes);
