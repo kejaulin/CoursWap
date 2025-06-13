@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const meetingSchema = new Schema({
+const oneToOneEventSchema = new Schema({
     etudiantId: {
         type: Schema.Types.ObjectId,
         ref: 'users',
@@ -12,13 +12,13 @@ const meetingSchema = new Schema({
         ref: 'users',
         required: true
     },
-    meetingId: { type: String, required: true },
+    oneToOneEventId: { type: String, required: true },
     date: { type: Date, required: true },
     heure: { type: String, required: true }, 
     mode: { type: String, enum: ['visio', 'présentiel'], required: true },
-   // meetingLocations: [{key:String, location: { lat: Number, lng: Number }}], 
+    meetingLocations: [{key:String, location: { lat: Number, lng: Number }}], 
     createdAt: { type: Date, default: Date.now },
 
     });
 
-module.exports = mongoose.model('MeetingTemp', meetingSchema);
+module.exports = mongoose.model('OneToOneEvents', oneToOneEventSchema);

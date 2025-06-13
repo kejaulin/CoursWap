@@ -102,20 +102,18 @@ function ContactProfesseur() {
       }
       const dateISO = convertDateToISO(date);
 
-      // Génération d’un meetingId (ici un simple UUID temporaire)
-      const meetingId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+      // Génération d’un oneToOneEventId (ici un simple UUID temporaire)
+      const oneToOneEventId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
 
-      // Construire l’objet meeting à envoyer
-      const meetingData = {
-        studentId: user._id,
+      // Construire l’objet oneToOneEvent à envoyer
+      const oneToOneEventData = {
+        etudiantId: user._id,
         profId: formData.profId,
-        meetingId,
+        oneToOneEventId,
         date: dateISO,
         heure: creneau, // ex: "08:00-10:00"
         mode: formData.mode,
-        lieu: formData.lieu || null,
-        chapitres: formData.chapitres,
-        classe: formData.classe,
+        lieu: formData.lieu || null
       };
 
       // Envoi de l’événement au calendrier
@@ -132,7 +130,7 @@ function ContactProfesseur() {
             const url2 = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url2;
-            a.download = 'meetingInfos.ics';
+            a.download = 'oneToOneEventInfos.ics';
             a.click();
             URL.revokeObjectURL(url2);  
           }
@@ -140,15 +138,15 @@ function ContactProfesseur() {
         }
       });
       
-    //Création du meeting en base
-    const meetingRes = await fetch('/api/meetings/create', {
+    //Création du oneToOneEvent en base
+    const oneToOneEventRes = await fetch('/api/onetooneevents/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify(meetingData),
+      body: JSON.stringify(oneToOneEventData),
     });
 
-    if (!meetingRes.ok) throw new Error('Erreur lors de la création du meeting');
+    if (!oneToOneEventRes.ok) throw new Error('Erreur lors de la création du oneToOneEvent');
 
      
   // Suppression du créneau réservé dans les dispos du prof
@@ -162,7 +160,6 @@ function ContactProfesseur() {
   if (!dispoRes.ok) throw new Error('Erreur lors de la mise à jour des disponibilités');
 
   const dispoData = await dispoRes.json();
-  console.log(dispoData)
 
   // Mettre à jour localement les dispos
   setProf(prev => ({
@@ -296,7 +293,7 @@ function ContactProfesseur() {
           className="border rounded-lg p-2"
         >
           <option value="visio">Visioconférence</option>
-          {prof.meetingLocations.length > 0 && <option value="presentiel">Présentiel</option> }
+          {prof.meetingLocations && prof.meetingLocations.length > 0 && <option value="presentiel">Présentiel</option> }
         </select>
 
         {formData.mode === "presentiel" && (

@@ -24,8 +24,7 @@ function ProfilPage() {
   const [profil, setProfil] = useState(null);
   const [showProfForm, setShowProfForm] = useState(false);
   const [role, setRole] = useState(user.role); // 'etudiant' ou 'professeur'
-  const [meetings, setMeetings] = useState([]);
-
+  const [onetooneevents, setOneToOneEvents] = useState([]);
 
   //charger les matières disponibles depuis l'API
   useEffect(() => {
@@ -60,17 +59,16 @@ function ProfilPage() {
 
     // Charger les réunions de l'utilisateur connecté
   useEffect(() => {
-    fetch('/api/meetingstemp/my-meetings', {
+    fetch('/api/onetooneevents/my-meetings', {
       credentials: 'include',
     })
       .then(res => res.json())
       .then(data => {
-        setMeetings(data);
+        setOneToOneEvents(data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, [user]);  
-
   // Créneaux fixes à cocher
   const allCreneaux = ["08:00-10:00", "10:00-12:00", "14:00-16:00", "16:00-18:00"];
 
@@ -249,7 +247,7 @@ return (
           disponibilites={dispos}
           onEdit={() => setShowProfForm(true)}
           onRetourAccueil={() => window.location.href = "/"}
-          meetings={meetings}
+          oneToOneEvents={onetooneevents}
           user={user}
         />
       ) : (
@@ -259,7 +257,7 @@ return (
           setShowProfForm(true);
         }}
         nom={nom || (profil && profil.nom)}
-        meetings={meetings}
+        oneToOneEvents={onetooneevents}
         user={user}
         />     
       )}
