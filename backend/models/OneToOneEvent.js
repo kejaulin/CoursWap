@@ -16,7 +16,6 @@ const oneToOneEventSchema = new Schema({
     date: { type: Date, required: true },
     heure: { type: String, required: true }, 
     mode: { type: String, enum: ['visio', 'présentiel'], required: true },
-    meetingLocations: [{key:String, location: { lat: Number, lng: Number }}], 
     createdAt: { type: Date, default: Date.now },
 
     });
