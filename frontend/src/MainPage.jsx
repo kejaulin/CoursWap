@@ -1,5 +1,6 @@
 import {useEffect, useState } from 'react';
 import { useAuth } from './component/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 function MainPage(){
 
@@ -8,12 +9,17 @@ function MainPage(){
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [allCourses, setCourses] = useState([]);
     const [meetings, setMeetings] = useState([]);
-
+    const [allProfesseurs, setAllProfesseurs] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetch('/api/courses')
           .then(res => res.json())
-          .then(data => setCourses(data.allCourses))
+          .then(data => setCourses(data.allCourses));
+
+        fetch('/api/users')
+            .then(res => res.json())
+            .then(data => setAllProfesseurs(data))
       }, []);
 
     useEffect(() => {
@@ -51,7 +57,11 @@ function MainPage(){
     const filteredMeetings = selectedSubject
         ? meetings.filter(meet => meet.summary === selectedSubject)
         : [];
-        
+    
+    const profsFiltres = selectedSubject
+        ? allProfesseurs.filter(prof => prof.matiere === selectedSubject)
+        : [];
+
     return(
     <div className="font-sans flex flex-col items-center">
         <section className="bg-purple-200 rounded-3xl p-6 m-4 mb-0.5 flex flex-col md:flex-row items-center justify-left w-9/10 space-x-2">
@@ -63,6 +73,26 @@ function MainPage(){
         <div className="flex flex-col items-center justify-between w-9/10">
             <section className="bg-purple-200 rounded-3xl p-6 m-4 mb-0.5 flex flex-col items-flex-start justify-left w-full">
                 <h4 className="text-2xl font-semibold mb-4">Professeurs de {selectedSubject} &#8680;</h4>
+                <div className="flex flex-wrap gap-6">
+    {profsFiltres.length === 0 ? (
+      <p>Aucun professeur trouvé pour cette matière.</p>
+    ) : (
+      profsFiltres.map((prof) => (
+        <button
+          key={prof._id}
+          className="flex flex-col items-center p-4 bg-white rounded-2xl shadow hover:bg-purple-100 transition cursor-pointer border-2 border-transparent hover:border-purple-400"
+          onClick={() => navigate(`/profs/${prof._id}`)}
+        >
+          <img
+            src={prof.photo}
+            alt={prof.nom}
+            className="w-20 h-20 object-cover rounded-full mb-2 border-2 border-purple-300"
+          />
+          <span className="font-bold text-lg text-purple-700">{prof.nom}</span>
+        </button>
+      ))
+    )}
+  </div>
             </section>
             <section className="bg-purple-200 rounded-3xl p-6 m-4 mb-0.5 flex flex-col items-flex-start justify-left w-full">
                 <h4 className="text-2xl font-semibold mb-4">Les dernières vidéos de {selectedSubject} &#8680;</h4>

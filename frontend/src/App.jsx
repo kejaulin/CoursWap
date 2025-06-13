@@ -5,19 +5,21 @@ import MainPage from './MainPage';
 import LoginRegister from './pages/LoginRegister';
 import CreateMeetingPage from './pages/CreateMeetingPage';
 import { useAuth } from './component/AuthProvider';
+import ProfilPage from './pages/ProfilPage';
 
 function App() {
   const { user, logout } = useAuth();
 
   return (
     <StrictMode>
-      <Header/>
       <BrowserRouter>
+       <Header/>
         { user ?
           <Routes>
             <Route path="/" element={<MainPage/>} />
             <Route path="/profs/:id" element={<ContactProfesseur />} />
             <Route path="/creer-meeting" element={<CreateMeetingPage />} />
+            <Route path="/profil" element={<ProfilPage />} />
           </Routes>
         :
         <Routes>
