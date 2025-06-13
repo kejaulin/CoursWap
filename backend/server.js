@@ -79,7 +79,6 @@ app.listen(PORT, () => {
 app.use('/professeurs', professeursRoutes);
 
 app.use('/users', userRoutes);
-//app.use('/uploads', express.static('uploads'));
 
 app.use('/onetooneevents', oneToOneEventRoutes );
 

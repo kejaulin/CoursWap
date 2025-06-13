@@ -104,7 +104,4 @@ router.put('/:id/disponibilites', ensureAuth, async (req, res) => {
   }
 });
 
-
-
-
 module.exports = router;

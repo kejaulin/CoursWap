@@ -19,14 +19,13 @@ exports.addGoogleCalendarEvent = async (req,res,next) =>{
       const formData = req.body;
       // formData.disponibilites = "08:00 - 10:00" par ex.
       const [datePart, timePart] = formData.disponibilites.split(' ');
-const isoDate = convertDateToISO(datePart);  // conversion ici
+      const isoDate = convertDateToISO(datePart);  // conversion ici
 
-const [startHour, endHour] = timePart.split('-').map(s => s.trim());
+      const [startHour, endHour] = timePart.split('-').map(s => s.trim());
 
-const startDateTime = moment(`${isoDate}T${startHour}:00`).toISOString();
-const endDateTime = moment(`${isoDate}T${endHour}:00`).toISOString();
+      const startDateTime = moment(`${isoDate}T${startHour}:00`).toISOString();
+      const endDateTime = moment(`${isoDate}T${endHour}:00`).toISOString();
 
-// const prof = await fetch(`http://localhost:4000/professeurs/${formData.profId}`)
       const prof = await fetch(`http://localhost:4000/users/${formData.profId}`)
       .then(res => {
         if (!res.ok) throw new Error("404");
