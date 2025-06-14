@@ -21,6 +21,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const professeursRoutes = require('./routes/professeurRoutes');
 const oneToOneEventRoutes = require('./routes/oneToOneEventRoutes');
+const statsRoutes = require('./routes/statsRoutes');
 
 mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
     console.log('Connected to MongoDB.');
@@ -86,3 +87,6 @@ app.use('/onetooneevents', oneToOneEventRoutes );
 
 const calendarRoutes = require('./routes/calendarRoutes');
 app.use('/calendar', calendarRoutes);
+
+app.use('/stats', statsRoutes);
+
