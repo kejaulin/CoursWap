@@ -1,9 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import moment from 'moment';
 
 
 
 function EspaceEtu({ nom, oneToOneEvents, user ,onDevenirProf }) {
+const [nbCreneauxProf, setNbCreneauxProf] = useState(null);
+const [nbCreneauxEtu, setNbCreneauxEtu] = useState(null);
+
+useEffect(() => {
+  fetch('http://localhost:4000/stats')
+    .then(res => res.json())
+    .then(data => {
+        const etuData = data.etudiants.find(e => e.id === user._id);
+        setNbCreneauxEtu(etuData?.totalCreneaux || 0);
+      })
+      .catch(err => {
+        console.error("Erreur stats étudiant :", err);
+      });
+  }, [user._id]);
 
   return (
     <div>
@@ -22,6 +36,21 @@ function EspaceEtu({ nom, oneToOneEvents, user ,onDevenirProf }) {
       >
         Devenir professeur
       </button>
+      <br />
+      <br />
+      {(nbCreneauxProf !== null || nbCreneauxEtu !== null) && (
+        <div className="bg-purple-100 p-4 rounded-xl text-purple-900 shadow mb-4 text-center w-full max-w-3xl mx-auto">
+          <h4 className="text-lg font-semibold mb-2">📊 Statistiques d'activité :</h4>
+         
+      {nbCreneauxEtu !== null && (
+        <p className="mb-2">
+          Tu as {nbCreneauxEtu === 0
+            ? "aucun rendez-vous prévu pour le moment"
+            : <>ou vas assister à <strong>{nbCreneauxEtu}</strong> rendez-vous</>} en tant qu’étudiant.
+        </p>
+      )}
+        </div>
+      )}
 
       <div  className="max-w-3xl mx-auto p-4" >
         <h2 className="text-2xl font-semibold mb-6 text-purple-700" >Mes rendez-vous</h2>
