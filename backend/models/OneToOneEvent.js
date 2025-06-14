@@ -15,9 +15,9 @@ const oneToOneEventSchema = new Schema({
     oneToOneEventId: { type: String, required: true },
     date: { type: Date, required: true },
     heure: { type: String, required: true }, 
-    mode: { type: String, enum: ['visio', 'présentiel'], required: true },
+    mode: { type: String, enum: ['visio', 'presentiel'], required: true },
     createdAt: { type: Date, default: Date.now },
-
-    });
+    location: {type: String}
+});
 
 module.exports = mongoose.model('OneToOneEvents', oneToOneEventSchema);

@@ -5,7 +5,7 @@ const OneToOneEvent = require('../models/OneToOneEvent');
 router.post('/create', async (req, res) => {
     try {
         
-      const { profId, oneToOneEventId, date, heure, mode } = req.body;
+      const { profId, oneToOneEventId, date, heure, mode, location } = req.body;
       const etudiantId = req.user._id;
       // Vérifie que tous les champs requis sont présents
       if ( !profId || !oneToOneEventId || !date || !heure || !mode) {
@@ -19,15 +19,14 @@ router.post('/create', async (req, res) => {
         oneToOneEventId,
         date,
         heure,
-        mode
+        mode,
+        location
       });
-    
       await newOneToOneEvent.save();
-
-      res.status(201).json({ success: true, meeting: newOneToOneEvent });
+      return res.status(201).json({ success: true, meeting: newOneToOneEvent });
     } catch (error) {
     console.error("Erreur création meeting :", error);
-    res.status(500).json({ error: 'Erreur serveur lors de la création du meeting' });
+    return res.status(500).json({ error: 'Erreur serveur lors de la création du meeting' });
   }
 });
 
@@ -46,7 +45,7 @@ router.get('/my-meetings', async (req, res) => {
     .sort({ date: 1 });  // tri par date croissante
     res.json(OneToOneEvents);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 });
 

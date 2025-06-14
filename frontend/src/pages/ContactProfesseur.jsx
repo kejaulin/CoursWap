@@ -86,9 +86,9 @@ function ContactProfesseur() {
   // Quand on clique sur « Envoyer la demande », on crée l’événement dans le calendar
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     
     if (!prof) return; // sécurité
+    if(formData.mode === "presentiel" && formData.location == '') return alert('Veuillez choisir une adresse');
 
     try {
      
@@ -113,7 +113,7 @@ function ContactProfesseur() {
         date: dateISO,
         heure: creneau, // ex: "08:00-10:00"
         mode: formData.mode,
-        lieu: formData.lieu || null
+        location: formData.location || null
       };
 
       // Envoi de l’événement au calendrier

@@ -12,7 +12,7 @@ exports.googleAuthenticate = (req,res,next) =>{
         })(req, res, next);
     } catch (err){
         next(err);
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }
 
@@ -23,7 +23,7 @@ exports.googleCallback = (req,res,next) =>{
             successRedirect:'http://localhost:3000'})(req, res, next);
     } catch (err){
         next(err);
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }
 
@@ -40,7 +40,7 @@ exports.userRegister = async (req,res) =>{
             res.send({success: true});
         });
     } catch (err){
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }
 
@@ -56,7 +56,7 @@ exports.userLocalLogin = (req,res,next) => {
         });
     })(req, res, next);
  }catch (err){
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
  } 
 }
     
@@ -69,7 +69,7 @@ exports.userLogout = (req,res) =>{
         });
         res.send(req.user);
     } catch (err){
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }
 
@@ -77,6 +77,6 @@ exports.getCurrentUser = (req,res) =>{
     try{
         res.send(req.user || {});
     } catch (err){
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }
