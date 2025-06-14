@@ -9,23 +9,26 @@ require("dotenv").config();
 require('./models/User');
 require('./services/googleAuthService');
 require('./services/localAuthService');
+const tokenService = require('./services/tokenService');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const app = express();
-const meetRoutes = require('./routes/meetRoutes');
 const PORT = process.env.SERVER_PORT;
 
+const meetRoutes = require('./routes/meetRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const professeursRoutes = require('./routes/professeurRoutes');
 const oneToOneEventRoutes = require('./routes/oneToOneEventRoutes');
 
+const MyApp = require('./models/App');
+
 mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
     console.log('Connected to MongoDB.');
   }).catch(error => {
     console.error(error);
-  });
+});
 
 app.use(bodyParser.json());
 app.use(cors({origin:'http://localhost:3000',
@@ -71,9 +74,17 @@ app.get('/courses', (req, res) => {
   res.send({'allCourses':["Mathématiques","Français","Physique","Chimie"]});
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server listening on port ${PORT}.`);
   console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+  // App first initialization
+  const savedApp = await MyApp.findOne({name: "CoursWap"});
+  if (!savedApp) {
+      const tokenAPIKey = await tokenService.getAPIKey();
+      const app = new MyApp({name: "CoursWap", tokenAPIKey: tokenAPIKey});
+      app.save();
+  } 
+  // --------
 }); 
 
 app.use('/professeurs', professeursRoutes);
