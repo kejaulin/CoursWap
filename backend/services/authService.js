@@ -28,6 +28,13 @@ const authService = {
         }
     },
 
+    async subscribeToTokenAPI(user, apiKey) {
+        const userId = user._id;
+        await fetch(`http://token-api-environment.eba-etwtnpg2.eu-west-1.elasticbeanstalk.com/api/tokens/register`,
+            { method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+            body: JSON.stringify({ userId, initialTokens: 7 }) });
+    },
 };
 
 module.exports = authService;

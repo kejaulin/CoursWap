@@ -39,7 +39,6 @@ const userService = {
             }
             throw err;
         }
-       
     },
 };
 

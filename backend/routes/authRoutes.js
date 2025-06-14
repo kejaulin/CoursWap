@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authControllers');
+const useAppTokenApiKey  = require('../middleware/tokenApiMiddleware');
 
 router.get('/google', authController.googleAuthenticate);
 
@@ -12,6 +13,6 @@ router.get('/current_user', authController.getCurrentUser);
 
 router.post('/login', authController.userLocalLogin);
 
-router.post('/register', authController.userRegister);
+router.post('/register',useAppTokenApiKey, authController.userRegister);
 
 module.exports = router;

@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const User = mongoose.model('users');
 
+const authService = require('../services/authService');
 exports.googleAuthenticate = (req,res,next) =>{
     try{
         console.log('Google authentication initiated');
@@ -35,6 +36,8 @@ exports.userRegister = async (req,res) =>{
 
         const hashedPassword = await bcrypt.hash(password,10);
         const user = await User.create({email,password:hashedPassword,authMethod:'local',role:'etudiant'});
+        //Souscription à la token API
+        await authService.subscribeToTokenAPI(user,req.appTokenApiKey);
         req.logIn(user, err => {
             if(err) return res.status(500).send('Erreur de session');
             res.send({success: true});
