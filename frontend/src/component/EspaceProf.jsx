@@ -15,14 +15,12 @@ function EspaceProf({ nom, disponibilites, onEdit, onRetourAccueil, oneToOneEven
       </div>
       <button
         className="bg-purple-500 text-white py-2 px-8 rounded-xl font-semibold hover:bg-purple-600"
-        onClick={onEdit}
-      >
-        Modifier mes disponibilités
+        onClick={onEdit}>
+        Modifier mes informations
       </button>
       <button
         className="mt-2 text-gray-600 underline"
-        onClick={onRetourAccueil}
-      >
+        onClick={onRetourAccueil}>
         Retour à l'accueil
       </button>
       <div className="max-w-3xl mx-auto p-4">

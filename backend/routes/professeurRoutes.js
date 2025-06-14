@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
     const profs = await User.find( {role: 'professeur'}).select({disponibilities:1, nom: 1, role:1, matiere:1}).exec();
     res.json(profs);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 });
 

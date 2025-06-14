@@ -12,18 +12,15 @@ const PoiMarkers = ({props, onLocationSelect}) => {
         if(!ev.location) return;
         setSelectedMarker(ev);
         map.panTo(ev.location);
-        fetch('/api/meetings/reverse-geocode', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(ev.location),
-        }).then(res => res.json()).then(data => {if(onLocationSelect) onLocationSelect({address:data})});
+        if(onLocationSelect) {onLocationSelect({address:ev.location.formattedAddress})}
     });
+
     return (
       <>
         {props.map( (poi) => (
           <AdvancedMarker
             key={poi.key}
-            position={poi.location}
+            position={{lat:poi.location.lat, lng: poi.location.lng}}
             clickable={true}
             onClick={() => handleClick(poi)}
             >
@@ -137,7 +134,7 @@ const GMAP = ({ infoType = undefined, poiMarkersList = [], onLocationSelect }) =
       </div>
       {selectedAddress && (
         <p className="mt-2 text-sm text-gray-800 px-4">
-          <strong>Lieu sélectionné :</strong> {selectedAddress.address}
+          <strong>Lieu sélectionné :</strong> {selectedAddress}
         </p>
       )}
     </div>

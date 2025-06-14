@@ -4,6 +4,7 @@ import { useAuth } from "../component/AuthProvider";
 import { toast, ToastContainer } from 'react-toastify';
 import EspaceProf from '../component/EspaceProf'; 
 import EspaceEtu from '../component/EspaceEtu'; 
+import AddressForm from '../component/AddressForm';
 
 function ProfilPage() {
   const [nom, setNom] = useState("");
@@ -52,7 +53,6 @@ function ProfilPage() {
             setProfilCree(true);
           }
         })
-      
         .finally(() => setLoading(false));
     }, []);
 
@@ -182,6 +182,12 @@ function ProfilPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+      <div>
+        <label className="block font-semibold mb-2">Lieu de rendez-vous en présentiel:</label>
+        <div className="overflow-x-auto">
+          <AddressForm userId={user._id} />
         </div>
       </div>
       <button
