@@ -1,8 +1,8 @@
-import React from 'react';
+import { useState } from "react";
 import moment from 'moment';
 
 function EspaceProf({ nom, disponibilites, onEdit, onRetourAccueil, oneToOneEvents, user }) {
-  return (
+return (
     <div className="flex flex-col items-center gap-4">
       <h3 className="text-xl font-bold text-purple-700 mb-4">Bienvenue, {nom} !</h3>
       <p className="mb-2">Tu es maintenant professeur.<br />Voici un résumé de tes disponibilités :</p>
@@ -54,11 +54,40 @@ function EspaceProf({ nom, disponibilites, onEdit, onRetourAccueil, oneToOneEven
                 <strong>Étudiant :</strong>{" "}
                 {String(oneToOneEvent.etudiantId._id) === String(user._id) ? "Vous" : oneToOneEvent.etudiantId.nom}
               </div>
+              <button
+              className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
+              onClick={async () => {
+                if (window.confirm("Confirmer l'annulation du rendez-vous ?")) {
+                  try {
+              const res = await fetch(`/api/onetooneevents/${oneToOneEvent._id}`, {
+                method: 'DELETE',
+                credentials: 'include',
+              });
+
+              const data = await res.json();
+
+              if (res.ok) {
+                alert(data.message || "Rendez-vous annulé");
+              } else {
+                console.error("Erreur serveur:", data.error);
+                alert("Erreur lors de la suppression");
+              }
+            } catch (err) {
+              console.error("Erreur réseau:", err);
+              alert("Erreur réseau");
+            }
+                }
+              }}
+            >
+              Annuler
+            </button>
             </div> </li>
             ))}
           </ul>
         )}
+        
       </div>
+      
     </div>
   );
 }

@@ -84,7 +84,7 @@ function MainPage(){
           onClick={() => navigate(`/profs/${prof._id}`)}
         >
           <img
-            src={prof.photo}
+             src={`http://localhost:4000${prof.photo}`}
             alt={prof.nom}
             className="w-20 h-20 object-cover rounded-full mb-2 border-2 border-purple-300"
           />

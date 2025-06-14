@@ -3,7 +3,19 @@ const router = express.Router();
 const multer = require('multer');
 const User = require('../models/User');
 
-const upload = multer({ dest: 'uploads/' });
+//Gestion des images 
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    // Garde l'extension d'origine
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + Date.now() + ext);
+  }
+});
+const upload = multer({ storage });
 
 // Middleware d'auth pour être sûr que req.user existe (sinon erreur 401)
 function ensureAuth(req, res, next) {

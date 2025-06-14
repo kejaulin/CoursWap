@@ -204,12 +204,10 @@ function ProfilPage() {
         <label className="block font-semibold mb-2">Je suis :</label>
         <div className="flex gap-6">
           <label className="flex items-center gap-2">
-            <input type="radio" name="role" value="etudiant" checked={user.role === "etudiant"} onChange={e => setRole(e.target.value)} />
-            Étudiant
+            <input type="radio" name="role" value="etudiant" checked={role === "etudiant"} onChange={e => setRole(e.target.value)}/>            Étudiant
           </label>
           <label className="flex items-center gap-2">
-            <input type="radio" name="role" value="professeur" checked={user.role === "professeur"} onChange={e => setRole(e.target.value)} />
-            Professeur
+            <input type="radio" name="role" value="professeur" checked={role === "professeur"} onChange={e => setRole(e.target.value)} />            Professeur
           </label>
         </div>
       </div>
@@ -234,6 +232,17 @@ function ProfilPage() {
 
 return (
   <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-8 mt-8">
+       <div className="flex flex-col items-center mr-8 min-w-[220px]">   
+        <button
+        type="button"
+        className="flex items-center gap-2 bg-purple-400 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-colors cursor-pointer mb-6"
+        onClick={() => window.location.href = 'http://localhost:3000'}>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Retour aux professeurs
+      </button>
+    </div>
     <ToastContainer />
     
     {!profilCree || showProfForm ? (
@@ -249,6 +258,8 @@ return (
           onRetourAccueil={() => window.location.href = "/"}
           oneToOneEvents={onetooneevents}
           user={user}
+ 
+
         />
       ) : (
         <EspaceEtu 
@@ -259,6 +270,7 @@ return (
         nom={nom || (profil && profil.nom)}
         oneToOneEvents={onetooneevents}
         user={user}
+
         />     
       )}
     </>

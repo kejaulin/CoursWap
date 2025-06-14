@@ -13,6 +13,7 @@ require('./services/localAuthService');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const app = express();
+const path = require('path');
 const meetRoutes = require('./routes/meetRoutes');
 const PORT = process.env.SERVER_PORT;
 
@@ -79,6 +80,7 @@ app.listen(PORT, () => {
 app.use('/professeurs', professeursRoutes);
 
 app.use('/users', userRoutes);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/onetooneevents', oneToOneEventRoutes );
 

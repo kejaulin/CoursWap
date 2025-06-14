@@ -102,16 +102,12 @@ function ContactProfesseur() {
       }
       const dateISO = convertDateToISO(date);
 
-      // Génération d’un oneToOneEventId (ici un simple UUID temporaire)
-      const oneToOneEventId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
-
-      // Construire l’objet oneToOneEvent à envoyer
+       // Construire l’objet oneToOneEvent à envoyer
       const oneToOneEventData = {
         etudiantId: user._id,
         profId: formData.profId,
-        oneToOneEventId,
         date: dateISO,
-        heure: creneau, // ex: "08:00-10:00"
+        heure: creneau, 
         mode: formData.mode,
         lieu: formData.lieu || null
       };
@@ -136,6 +132,7 @@ function ContactProfesseur() {
           }
           alert('Le rendez-vous a été ajouté à ton calendrier !');
         }
+        alert('Rendez-vous créé avec succès !');
       });
       
     //Création du oneToOneEvent en base
@@ -169,7 +166,6 @@ function ContactProfesseur() {
   
  
   setShowForm(false);
- 
     } catch (error) {
       console.error("Erreur lors de l’insertion dans Calendar :", error);
       alert('Une erreur est survenue lors de la création du rendez-vous.');
@@ -191,15 +187,21 @@ function ContactProfesseur() {
       <section className="bg-white rounded-3xl p-8 mb-6 flex flex-col md:flex-row gap-6 items-center shadow-lg relative">
       
       <div className="flex flex-col items-center mr-8 min-w-[220px]">   
-    <button
-      className="self-start text-2l text-gray-500 hover:text-purple-700 font-bold  "
-      onClick={() => window.location.href = 'http://localhost:3000'}>
-      <span className="mr-1">&#8592;</span>
-      <span className="text-xl font-semibold">Retour aux professeurs</span>
-    </button>
-</div>
-        <img src={prof.photo} alt={`Photo de ${prof.nom}`}
-             className="w-32 h-32 rounded-2xl object-cover shadow-md" />
+          <button
+        type="button"
+        className="flex items-center gap-2 bg-purple-400 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-colors cursor-pointer mb-6"
+        onClick={() => window.location.href = 'http://localhost:3000'}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Retour aux professeurs
+      </button>
+    </div>
+        <img 
+        src={`http://localhost:4000${prof.photo}`}
+        alt={`Photo de ${prof.nom}`}
+        className="w-32 h-32 rounded-2xl object-cover shadow-md" />
         <div className="flex flex-col gap-1 flex-1 ml-0 md:ml-6">
           <h2 className="text-3xl font-bold">{prof.nom}</h2>
           <p className="text-lg text-gray-600 font-semibold">Professeur de {prof.matiere}</p>
