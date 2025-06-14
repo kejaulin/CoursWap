@@ -38,7 +38,6 @@ function ProfilPage() {
     fetch("/api/users/me", { credentials: "include" })
       .then(res => res.json())
       .then(data => {
-          console.log("user connecté:", data);
           setProfil(data);
           setLoading(false);
         // Si profil déjà créé (nom ET role présents), => pas de form

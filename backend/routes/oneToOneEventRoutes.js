@@ -5,7 +5,7 @@ const OneToOneEvent = require('../models/OneToOneEvent');
 router.post('/create', async (req, res) => {
     try {
         
-      const { profId, oneToOneEventId, date, heure, mode } = req.body;
+      const { profId, oneToOneEventId, date, heure, mode, location } = req.body;
       const etudiantId = req.user._id;
       // Vérifie que tous les champs requis sont présents
       if ( !profId || !oneToOneEventId || !date || !heure || !mode) {
@@ -19,11 +19,10 @@ router.post('/create', async (req, res) => {
         oneToOneEventId,
         date,
         heure,
-        mode
+        mode,
+        location
       });
-    
       await newOneToOneEvent.save();
-
       res.status(201).json({ success: true, meeting: newOneToOneEvent });
     } catch (error) {
     console.error("Erreur création meeting :", error);
