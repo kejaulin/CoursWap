@@ -19,14 +19,12 @@ function MainPage(){
 
         fetch('/api/users')
             .then(res => res.json())
-            .then(data => setAllProfesseurs(data))
-      }, []);
+            .then(data => setAllProfesseurs(data));
 
-    useEffect(() => {
         fetch('/api/meetings')
             .then(res => res.json())
             .then(data => setMeetings(data));
-    }, []);
+      }, []);
 
     if (!user){
         return(

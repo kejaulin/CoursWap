@@ -83,3 +83,15 @@ exports.registerUser = async (req, user) => {
         return res.status(500).json({ success: false, error: err.message });
     }
 }
+
+exports.getUserCurrentTokenAmount = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
+
+        const tokens = await userService.getUserCurrentTokenAmount(user, req.appTokenApiKey);
+        return res.status(200).json( tokens );
+    } catch (err) {
+        return res.status(500).json({ success: false, error: err.message });
+    }
+}

@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const User = require('../models/User');
 const userController = require('../controllers/userController');
+const useAppTokenApiKey  = require('../middleware/tokenApiMiddleware');
 
 const upload = multer({ dest: 'uploads/' });
 // Middleware d'auth pour être sûr que req.user existe (sinon erreur 401)
@@ -202,5 +203,7 @@ router.get('/:id/addresses', userController.profAddresses);
  *         description: Erreur serveur
  */
 router.put('/:id/saveaddresses', userController.geocode );
+
+router.get('/:id/tokens',useAppTokenApiKey, userController.getUserCurrentTokenAmount);
 
 module.exports = router;
