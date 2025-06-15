@@ -17,7 +17,7 @@ const meetService = {
         return (res.data.items || []).filter(isGoogleMeetEvent);
     },
 
-    async createGoogleMeet(auth, { summary = 'Test Meeting', startDateTime, endDateTime } = {}) {
+    async createGoogleMeet(auth, {matiere ='', summary = 'Test Meeting', startDateTime, endDateTime } = {}) {
         const calendar = google.calendar({ version: 'v3', auth });
         const event = {
             summary,

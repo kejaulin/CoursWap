@@ -88,7 +88,7 @@ function MainPage(){
     }
 
     const filteredMeetings = selectedSubject
-        ? meetings.filter(meet => meet.summary === selectedSubject)
+        ? meetings.filter(meet => meet.matiere === selectedSubject)
         : [];
 
     const profsFiltres = selectedSubject

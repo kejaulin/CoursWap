@@ -5,8 +5,8 @@ const userService = require('../services/userService');
 
 exports.createMeet = async (req, res) => {
     try {
-        const { summary, startDateTime, endDateTime, rejoinCost, originalCost } = req.body;
-        if (!summary || !startDateTime || !endDateTime) {
+        const { matiere, summary, startDateTime, endDateTime, rejoinCost, originalCost, keywords } = req.body;
+        if (!matiere ||!summary || !startDateTime || !endDateTime) {
             return res.status(400).json({ error: "Tous les champs sont obligatoires." });
         }
         if (new Date(startDateTime) >= new Date(endDateTime)) {
@@ -17,6 +17,7 @@ exports.createMeet = async (req, res) => {
         const event = await meetService.createGoogleMeet(auth, req.body);
 
         const meeting = new Meeting({
+            matiere: matiere,
             summary: event.summary,
             startDateTime: event.start.dateTime,
             endDateTime: event.end.dateTime,
@@ -25,7 +26,8 @@ exports.createMeet = async (req, res) => {
             eventId: event.id,
             rejoinCost: rejoinCost,
             originalCost: originalCost,
-            participants: []
+            participants: [],
+            keywords: keywords
         });
         await meeting.save();
         return res.status(201).json(event);

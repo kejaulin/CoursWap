@@ -59,9 +59,6 @@ const userService = {
     },
 
     async addUserToken(userId, apiKey,amount) {
-        console.log(userId);
-        console.log(apiKey);
-        console.log(amount);
         const newUserTokenAmount = await fetch(`http://token-api-environment.eba-etwtnpg2.eu-west-1.elasticbeanstalk.com/api/tokens/${userId}/add`,
             { method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },

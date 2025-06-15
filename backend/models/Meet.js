@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const meetSchema = new mongoose.Schema({
     summary: String,
+    matiere: String,
     startDateTime: Date,
     endDateTime: Date,
     createdBy: {
@@ -30,6 +31,7 @@ const meetSchema = new mongoose.Schema({
         required: true
     },  
     participants: [], 
+    keywords: []
 })
 
 module.exports = mongoose.model('meetings', meetSchema);

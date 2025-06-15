@@ -16,6 +16,9 @@ const useAppTokenApiKey = require('../middleware/tokenApiMiddleware');
  *           schema:
  *             type: object
  *             properties:
+ *               matiere:
+ *                 type: string
+ *                 example: Mathématiques
  *               summary:
  *                 type: string
  *                 example: Réunion de test
@@ -32,6 +35,14 @@ const useAppTokenApiKey = require('../middleware/tokenApiMiddleware');
  *                 type: number
  *                 example: 0
  *                 min: 0
+ *               participants:
+ *                 type: array
+ *                 description: Liste des IDs des participants
+ *                 items: [String]
+ *               keywords:
+ *                 type: array
+ *                 description: Liste de mots clés
+ *                 items: [String]
  *     responses:
  *       201:
  *         description: Réunion créée
