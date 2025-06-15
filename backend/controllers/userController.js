@@ -50,7 +50,7 @@ exports.profAddresses = async (req, res) => {
     }
 }
 
-exports.registerUser = async (req, user) => {
+exports.registerUser = async (req, res, user) => {
     try {
         // Récupère l’email de l’utilisateur connecté (Google)
         const email = req.user.email;
@@ -91,6 +91,16 @@ exports.getUserCurrentTokenAmount = async (req, res) => {
 
         const tokens = await userService.getUserCurrentTokenAmount(user, req.appTokenApiKey);
         return res.status(200).json( tokens );
+    } catch (err) {
+        return res.status(500).json({ success: false, error: err.message });
+    }
+}
+
+exports.substractUserToken = async (req, res) => {
+    try {
+        const {amount} = req.body
+        const newUserTokenAmount = await userService.substractUserToken(req.params.id, req.appTokenApiKey,amount);
+        return res.status(200).json( newUserTokenAmount );
     } catch (err) {
         return res.status(500).json({ success: false, error: err.message });
     }

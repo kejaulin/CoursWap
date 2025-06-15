@@ -48,6 +48,27 @@ const userService = {
             headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey } }).then(res =>{ return res.json()});
         return userTokenInfos.tokens;
     },
+
+    async substractUserToken(userId, apiKey,amount) {
+        const newUserTokenAmount = await fetch(`http://token-api-environment.eba-etwtnpg2.eu-west-1.elasticbeanstalk.com/api/tokens/${userId}/subtract`,
+            { method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+            body: JSON.stringify({ amount: amount })
+         }).then(res =>{ return res.json()});
+        return newUserTokenAmount.tokens;
+    },
+
+    async addUserToken(userId, apiKey,amount) {
+        console.log(userId);
+        console.log(apiKey);
+        console.log(amount);
+        const newUserTokenAmount = await fetch(`http://token-api-environment.eba-etwtnpg2.eu-west-1.elasticbeanstalk.com/api/tokens/${userId}/add`,
+            { method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+            body: JSON.stringify({ amount: amount })
+         }).then(res =>{ return res.json()});
+        return newUserTokenAmount.tokens;
+    },
 };
 
 module.exports = userService;

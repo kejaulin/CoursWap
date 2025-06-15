@@ -20,7 +20,16 @@ const meetSchema = new mongoose.Schema({
     eventId: {
         type: String,
         required: true
-    }
+    },
+    rejoinCost: {
+        type: Number,
+        required: true
+    },    
+    originalCost: {
+        type: Number,
+        required: true
+    },  
+    participants: [], 
 })
 
 module.exports = mongoose.model('meetings', meetSchema);

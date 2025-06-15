@@ -1,10 +1,11 @@
 const authService = require('../services/authService');
 const meetService = require('../services/meetService');
 const Meeting = require('../models/Meet');
+const userService = require('../services/userService');
 
 exports.createMeet = async (req, res) => {
     try {
-        const { summary, startDateTime, endDateTime } = req.body;
+        const { summary, startDateTime, endDateTime, rejoinCost, originalCost } = req.body;
         if (!summary || !startDateTime || !endDateTime) {
             return res.status(400).json({ error: "Tous les champs sont obligatoires." });
         }
@@ -21,7 +22,10 @@ exports.createMeet = async (req, res) => {
             endDateTime: event.end.dateTime,
             createdBy: req.user._id,
             hangoutLink: event.hangoutLink,
-            eventId: event.id
+            eventId: event.id,
+            rejoinCost: rejoinCost,
+            originalCost: originalCost,
+            participants: []
         });
         await meeting.save();
         return res.status(201).json(event);
@@ -89,6 +93,26 @@ exports.updateMeet = async (req, res) => {
         meeting.hangoutLink = event.hangoutLink;
         await meeting.save();
 
+        res.json(meeting);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
+
+exports.joinMeet = async (req, res) => {
+    try {
+        const meeting = await Meeting.findById(req.params.id);
+        const {participantInfos} = req.body;
+        if (!meeting) {
+            return res.status(404).json({ error: 'Meeting not found' });
+        }
+        meeting.participants.push(participantInfos);
+        await meeting.save();
+        if( meeting.participants.length === 1){
+            await userService.addUserToken(meeting.createdBy, req.appTokenApiKey,Math.floor((meeting.originalCost +1)/2));
+        } else if(meeting.participants.length === 5){
+            await userService.addUserToken(meeting.createdBy, req.appTokenApiKey,meeting.originalCost);
+        }
         res.json(meeting);
     } catch (err) {
         return res.status(500).json({ error: err.message });
