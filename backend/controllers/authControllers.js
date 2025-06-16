@@ -5,13 +5,14 @@ const User = mongoose.model('users');
 
 exports.googleAuthenticate = (req,res,next) =>{
     try{
+        console.log('Google authentication initiated');
         passport.authenticate('google', {
             scope: ['profile', 'email', 'https://www.googleapis.com/auth/calendar'],
             accessType: 'offline',
         })(req, res, next);
     } catch (err){
         next(err);
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }
 
@@ -22,7 +23,7 @@ exports.googleCallback = (req,res,next) =>{
             successRedirect:'http://localhost:3000'})(req, res, next);
     } catch (err){
         next(err);
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }
 
@@ -33,13 +34,13 @@ exports.userRegister = async (req,res) =>{
         if(userInfos) return res.status(400).send({message:'Impossible de créer l\'utilisateur'});
 
         const hashedPassword = await bcrypt.hash(password,10);
-        const user = await User.create({email,password:hashedPassword,authMethod:'local'});
+        const user = await User.create({email,password:hashedPassword,authMethod:'local',role:'etudiant'});
         req.logIn(user, err => {
             if(err) return res.status(500).send('Erreur de session');
             res.send({success: true});
         });
     } catch (err){
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }
 
@@ -55,7 +56,7 @@ exports.userLocalLogin = (req,res,next) => {
         });
     })(req, res, next);
  }catch (err){
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
  } 
 }
     
@@ -68,7 +69,7 @@ exports.userLogout = (req,res) =>{
         });
         res.send(req.user);
     } catch (err){
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }
 
@@ -76,6 +77,6 @@ exports.getCurrentUser = (req,res) =>{
     try{
         res.send(req.user || {});
     } catch (err){
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }

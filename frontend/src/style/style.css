@@ -1,105 +1,12 @@
+@import "tailwindcss";
 
-
-/* Contacte Professeur */
-
-/* Structure générale */
-.contact-prof {
-  font-family: 'Arial', sans-serif;
-  background-color: #f9f4fc;
-  color: #333;
-  padding: 2rem;
- /* max-width: 800px;*/
-  margin: 0 auto;
-}
-
-/* Logo */
-.header {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 2rem;
-}
-
-.logo {
-  height: 200px;
-}
-
-/* Profil du professeur */
-.prof-info {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 1.5rem;
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-  margin-bottom: 2rem;
-}
-
-.avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 16px;
-  object-fit: cover;
-}
-
-.prof-info h2 {
+body {
   margin: 0;
-  font-size: 1.5rem;
-}
-
-.prof-info p {
-  margin: 0.5rem 0;
-  color: #666;
-}
-
-/* Formulaire */
-.formulaire {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* Champs */
-.formulaire label {
-  font-weight: bold;
-  margin-bottom: 0.3rem;
-  display: block;
-  font-size: 0.95rem;
-}
-
-.formulaire input[type="text"],
-.formulaire select {
-  width: 100%;
-  padding: 0.8rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-.formulaire select:invalid {
-  color: #999;
-}
-
-/* Bouton */
-.formulaire > button {
-  margin-top: 1rem;
-  background-color: #6842B9;
-  color: #fff;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
-}
-
-.formulaire > button:hover {
-  background-color: #5734a0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .map-container {
@@ -118,4 +25,8 @@
   margin-top: 1rem;
 }
 
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
 

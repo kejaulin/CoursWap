@@ -7,7 +7,13 @@ const userSchema = new Schema({
     refreshToken: String, // long-live, used to get new access token
     email: String,
     password: String,
-    authMethod: String
+    authMethod: String,
+    nom: String, 
+    role: { type: String, enum: ['etudiant', 'professeur'] }, 
+    matiere: String, 
+    disponibilites: Array, 
+    photo: String, 
+    meetingLocations: [{key:String, location: { street: String, city: String, postalCode: String, country: String, formattedAddress:String, lat: Number, lng: Number }}], 
 });
 
-mongoose.model('users',userSchema);
+module.exports = mongoose.model('users',userSchema);

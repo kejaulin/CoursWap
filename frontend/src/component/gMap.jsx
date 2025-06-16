@@ -12,18 +12,15 @@ const PoiMarkers = ({props, onLocationSelect}) => {
         if(!ev.location) return;
         setSelectedMarker(ev);
         map.panTo(ev.location);
-        fetch('/api/meetings/reverse-geocode', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(ev.location),
-        }).then(res => res.json()).then(data => {if(onLocationSelect) onLocationSelect({address:data})});
+        if(onLocationSelect) {onLocationSelect({address:ev.location.formattedAddress})}
     });
+
     return (
       <>
         {props.map( (poi) => (
           <AdvancedMarker
             key={poi.key}
-            position={poi.location}
+            position={{lat:poi.location.lat, lng: poi.location.lng}}
             clickable={true}
             onClick={() => handleClick(poi)}
             >
@@ -52,7 +49,6 @@ const GMAP = ({ infoType = undefined, poiMarkersList = [], onLocationSelect }) =
   const [selfCenterButton, showSelfCenterButton] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState('');
   const mapRef = useRef(null);
-
   useEffect(() => {
     if (infoType === "prof") {
       if (!navigator.geolocation) {
@@ -112,15 +108,10 @@ const GMAP = ({ infoType = undefined, poiMarkersList = [], onLocationSelect }) =
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="map-container">
-      {selectedAddress && (
-        <p className="mt-2 text-sm text-gray-800 px-4">
-          <strong>Lieu sélectionné :</strong> {selectedAddress.address}
-        </p>
-      )}
-      <div className="map-placeholder overflow-hidden relative">
+    <div className="map-container h-75 w-full">
+      <div className="map-placeholder overflow-hidden relative h-65 w-full rounded-2xl">
         {selfCenterButton && (
-        <button className="absolute bottom-4 right-4 z-10 mt-4 bg-[#6842B9] text-white border-none px-3 py-1 rounded-full cursor-pointer transition-colors duration-300 hover:bg-[#5a38a0]"
+        <button className="absolute bottom-4 right-4 z-10 mt-4 bg-[#6842B9] text-white border-none px-3 py-2 rounded-full cursor-pointer transition-colors duration-300 hover:bg-[#5a38a0] flex items-center justify-center"
         type="button" onClick={handleUserLocation}>
             <span className='text-xs'>Recentrer sur ma position</span>
         </button>
@@ -141,6 +132,11 @@ const GMAP = ({ infoType = undefined, poiMarkersList = [], onLocationSelect }) =
         </Map>
       </APIProvider>
       </div>
+      {selectedAddress && (
+        <p className="mt-2 text-sm text-gray-800 px-4">
+          <strong>Lieu sélectionné :</strong> {selectedAddress}
+        </p>
+      )}
     </div>
   );
 };

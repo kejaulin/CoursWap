@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const Professeur = require('../models/Professeur');
+const User = require('../models/User');
 
 // Obtenir tous les professeurs
 router.get('/', async (req, res) => {
   try {
-    const profs = await Professeur.find();
+    const profs = await User.find( {role: 'professeur'}).select({disponibilities:1, nom: 1, role:1, matiere:1}).exec();
     res.json(profs);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 });
 
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    const prof = await Professeur.findById(req.params.id);
+    const prof = await User.findById(req.params.id).select({disponibilities:1, nom: 1, role:1, matiere:1});
     if (!prof) {
       return res.status(404).json({ message: 'Professeur non trouvé' });
     }

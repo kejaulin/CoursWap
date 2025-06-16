@@ -24,12 +24,12 @@ exports.createMeet = async (req, res) => {
             eventId: event.id
         });
         await meeting.save();
-        res.status(201).json(event);
+        return res.status(201).json(event);
     } catch (err) {
         if (err.name === 'ValidationError') {
             return res.status(400).json({ error: err.message });
         }
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 };
 
@@ -44,7 +44,7 @@ exports.listMeets = async (req, res) => {
         .populate('createdBy', 'nom photo');
         res.json(meetings);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 };
 
@@ -56,7 +56,7 @@ exports.getMeet = async (req, res) => {
         }
         res.json(meeting);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 };
 
@@ -69,9 +69,9 @@ exports.deleteMeet = async (req, res) => {
         const auth = await authService.getAuthorizedClient(req.user);
         await meetService.deleteEvent(auth, meeting.eventId);
         await meeting.deleteOne();
-        res.status(204).send();
+        return res.status(204).send();
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 };
 
@@ -91,7 +91,7 @@ exports.updateMeet = async (req, res) => {
 
         res.json(meeting);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 };
 
@@ -101,6 +101,6 @@ exports.reverseGeocode = async (req,res) =>{
         const address = await meetService.reverseGeocode(lat,lng);
         res.send({address:address});
     } catch (err){
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }
