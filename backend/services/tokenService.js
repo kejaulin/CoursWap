@@ -1,3 +1,5 @@
+const App = require('../models/App');
+
 const tokenService = {
     async getAPIKey() {
         try {
@@ -22,6 +24,12 @@ const tokenService = {
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
+    },
+
+    async handleTokensRegenerated(appId, regeneratedAt){
+        await App.findOneAndUpdate( { appId },
+            { $set: {tokenRegeneratedDate: regeneratedAt} },
+            { new: true });        
     }
 }
 

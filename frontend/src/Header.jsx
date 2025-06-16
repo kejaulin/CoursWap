@@ -2,43 +2,79 @@ import { useAuth } from './component/AuthProvider';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { UserPlusIcon } from '@heroicons/react/24/solid';
+import { io } from "socket.io-client";
 
-function Header(){
+const socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000');
 
-  const [tokens, setTokens] = useState(0); 
-  const handleLogout = ()=>{
-    fetch('/api/auth/logout',{
-        credentials:'include',
-        method:'POST',
-    }).then(()=>{
-        window.location.href="/";
-    })
-  };
-
-  const { user, logout } = useAuth();
+function Header() {
+  const [tokens, setTokens] = useState(0);
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
-      fetch(`/api/users/${user._id}/tokens`)
-      .then(res => res.json())
-      .then(tokens => {
-        setTokens(tokens);
-      });
-    }
-  },[user]);
+    if (!user?._id) return;
 
-  return(
-    <header className="flex justify-between items-center p-2 shadow-md h-20"> 
+    let subscribedAppId = null;
+
+    const fetchAppInfos = async () => {
+      try {
+        const res = await fetch('/api/auth/appinfos', {
+          credentials: 'include',
+          method: 'GET',
+        });
+        const appInfos = (await res.json())[0];
+        if (appInfos?._id) {
+          subscribedAppId = appInfos._id;
+          socket.emit('subscribeToApp', subscribedAppId);
+
+          // Récupération initiale
+          const tokensRes = await fetch(`/api/users/${user._id}/tokens`);
+          const tokens = await tokensRes.json();
+          setTokens(tokens);
+
+          // Écoute de l'événement WebSocket
+          socket.on('tokens_regenerated', ({ regeneratedAt }) => {
+            fetch(`/api/users/${user._id}/tokens`)
+              .then(res => res.json())
+              .then(tokens => {
+                setTokens(tokens);
+              });
+          });
+        }
+      } catch (error) {
+        console.error('Récupération appInfos échouée:', error);
+      }
+    };
+
+    fetchAppInfos();
+
+    return () => {
+      socket.off('tokens_regenerated');
+      if (subscribedAppId) {
+        socket.emit('unsubscribeFromApp', subscribedAppId);
+      }
+    };
+  }, [user]);
+
+  const handleLogout = () => {
+    fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+    }).then(() => {
+      navigate('/');
+    });
+  };
+
+  return (
+    <header className="flex justify-between items-center p-2 shadow-md h-20">
       <div className="flex items-center space-x-2 h-full">
-        <img onClick={() => navigate("/")} src="./../img/appLogo.png" alt="Courswap Logo" className="object-cover w-full h-full hover:cursor-pointer"/>
+        <img onClick={() => navigate("/")} src="./../img/appLogo.png" alt="Courswap Logo" className="object-cover w-full h-full hover:cursor-pointer" />
       </div>
       <div className="flex justify-between items-center px-6 py-3 bg-white">
-
         {!user ? (
           <div className="inline-flex">
             <button
-              onClick={()=> navigate('/loginPage')}
+              onClick={() => navigate('/loginPage')}
               className="border px-4 py-1 rounded-2xl hover:bg-blue-600 hover:text-white font-bold"
             >
               Connexion
@@ -71,7 +107,6 @@ function Header(){
           </>
         )}
       </div>
-
     </header>
   );
 };

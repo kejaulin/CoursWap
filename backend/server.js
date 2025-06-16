@@ -4,6 +4,8 @@ const cors = require('cors');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
 const mongoose = require('mongoose');
+const http = require('http');
+const { Server } = require('socket.io');
 
 require("dotenv").config();
 require('./models/User');
@@ -21,8 +23,20 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const professeursRoutes = require('./routes/professeurRoutes');
 const oneToOneEventRoutes = require('./routes/oneToOneEventRoutes');
+const tokenRoutes = require('./routes/tokenRoutes');
+const calendarRoutes = require('./routes/calendarRoutes');
 
 const MyApp = require('./models/App');
+
+const server = http.createServer(app);
+const io = new Server(server,{
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST","PUT","DELETE"],
+    credentials:true
+  },
+});
+app.set('io', io);
 
 mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
     console.log('Connected to MongoDB.');
@@ -74,15 +88,29 @@ app.get('/courses', (req, res) => {
   res.send({'allCourses':["Mathématiques","Français","Physique","Chimie"]});
 });
 
-app.listen(PORT, async () => {
+app.use('/tokens', tokenRoutes);
+
+
+io.on('connection', (socket) => {
+  socket.on('subscribeToApp', (appId) => {
+    socket.join(appId);
+  });
+
+  socket.on('unsubscribeFromApp', (appId) => {
+    socket.leave(appId);
+  });
+
+});
+
+server.listen(PORT, async () => {
   console.log(`Server listening on port ${PORT}.`);
   console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
   // App first initialization
   const savedApp = await MyApp.findOne({name: "CoursWap"});
   if (!savedApp) {
       const tokenAPIKey = await tokenService.getAPIKey();
-      const app = new MyApp({name: "CoursWap", tokenAPIKey: tokenAPIKey});
-      app.save();
+      const myApp = new MyApp({name: "CoursWap", tokenAPIKey: tokenAPIKey, tokenRegeneratedDate: new Date().now()});
+      myApp.save();
   } 
   // --------
 }); 
@@ -93,5 +121,4 @@ app.use('/users', userRoutes);
 
 app.use('/onetooneevents', oneToOneEventRoutes );
 
-const calendarRoutes = require('./routes/calendarRoutes');
 app.use('/calendar', calendarRoutes);

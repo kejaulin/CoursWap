@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const User = mongoose.model('users');
 
 const authService = require('../services/authService');
+const App = require('../models/App');
+
 exports.googleAuthenticate = (req,res,next) =>{
     try{
         console.log('Google authentication initiated');
@@ -64,21 +66,30 @@ exports.userLocalLogin = (req,res,next) => {
 }
     
 exports.userLogout = (req,res) =>{
-    try{
-        req.logout(() => {
-            req.session.destroy(() => {
-                res.redirect('/');
-            });
-        });
-        res.send(req.user);
-    } catch (err){
-        return res.status(500).json({ error: err.message });   
-    }
+  try {
+    req.logout(() => {
+      req.session.destroy(() => {
+        res.clearCookie('connect.sid');
+        res.status(200).json({ message: 'Déconnexion réussie' });
+      });
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 }
 
 exports.getCurrentUser = (req,res) =>{
     try{
         res.send(req.user || {});
+    } catch (err){
+        return res.status(500).json({ error: err.message });   
+    }
+}
+
+exports.getAppInfos = async (req,res) => {
+    try{
+        const appInfos = await App.find();
+        res.send(appInfos);
     } catch (err){
         return res.status(500).json({ error: err.message });   
     }
