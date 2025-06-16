@@ -34,14 +34,12 @@ function EspaceProf({ nom, disponibilites, onEdit, onRetourAccueil, oneToOneEven
       </div>
       <button
         className="bg-purple-500 text-white py-2 px-8 rounded-xl font-semibold hover:bg-purple-600"
-        onClick={onEdit}
-      >
-        Modifier mes disponibilités
+        onClick={onEdit}>
+        Modifier mes informations
       </button>
       <button
         className="mt-2 text-gray-600 underline"
-        onClick={onRetourAccueil}
-      >
+        onClick={onRetourAccueil}>
         Retour à l'accueil
       </button>
       <div className="max-w-3xl mx-auto p-4">
@@ -76,6 +74,11 @@ function EspaceProf({ nom, disponibilites, onEdit, onRetourAccueil, oneToOneEven
                 <div className="mb-2 text-gray-700">
                   <strong>Mode :</strong> {oneToOneEvent.mode}
                 </div>
+                {oneToOneEvent.mode === 'presentiel' && (
+                  <div className="mb-2 text-gray-700">
+                    <strong>Lieu :</strong> {oneToOneEvent.location}
+                  </div>
+                )}
                 <div className="flex gap-6 text-gray-800 font-medium">
                   <div>
                     <strong>Professeur :</strong>{" "}
@@ -113,8 +116,8 @@ function EspaceProf({ nom, disponibilites, onEdit, onRetourAccueil, oneToOneEven
                   >
                     Annuler
                   </button>
-                </div> </li>
-
+                </div> 
+              </li>
             ))}
           </ul>
         )}

@@ -1,11 +1,12 @@
 const authService = require('../services/authService');
 const meetService = require('../services/meetService');
 const Meeting = require('../models/Meet');
+const userService = require('../services/userService');
 
 exports.createMeet = async (req, res) => {
     try {
-        const { summary, startDateTime, endDateTime } = req.body;
-        if (!summary || !startDateTime || !endDateTime) {
+        const { matiere, summary, startDateTime, endDateTime, rejoinCost, originalCost, keywords } = req.body;
+        if (!matiere ||!summary || !startDateTime || !endDateTime) {
             return res.status(400).json({ error: "Tous les champs sont obligatoires." });
         }
         if (new Date(startDateTime) >= new Date(endDateTime)) {
@@ -16,20 +17,25 @@ exports.createMeet = async (req, res) => {
         const event = await meetService.createGoogleMeet(auth, req.body);
 
         const meeting = new Meeting({
+            matiere: matiere,
             summary: event.summary,
             startDateTime: event.start.dateTime,
             endDateTime: event.end.dateTime,
             createdBy: req.user._id,
             hangoutLink: event.hangoutLink,
-            eventId: event.id
+            eventId: event.id,
+            rejoinCost: rejoinCost,
+            originalCost: originalCost,
+            participants: [],
+            keywords: keywords
         });
         await meeting.save();
-        res.status(201).json(event);
+        return res.status(201).json(event);
     } catch (err) {
         if (err.name === 'ValidationError') {
             return res.status(400).json({ error: err.message });
         }
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 };
 
@@ -44,7 +50,7 @@ exports.listMeets = async (req, res) => {
         .populate('createdBy', 'nom photo');
         res.json(meetings);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 };
 
@@ -56,7 +62,7 @@ exports.getMeet = async (req, res) => {
         }
         res.json(meeting);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 };
 
@@ -69,9 +75,9 @@ exports.deleteMeet = async (req, res) => {
         const auth = await authService.getAuthorizedClient(req.user);
         await meetService.deleteEvent(auth, meeting.eventId);
         await meeting.deleteOne();
-        res.status(204).send();
+        return res.status(204).send();
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 };
 
@@ -91,7 +97,27 @@ exports.updateMeet = async (req, res) => {
 
         res.json(meeting);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
+    }
+};
+
+exports.joinMeet = async (req, res) => {
+    try {
+        const meeting = await Meeting.findById(req.params.id);
+        const {participantInfos} = req.body;
+        if (!meeting) {
+            return res.status(404).json({ error: 'Meeting not found' });
+        }
+        meeting.participants.push(participantInfos);
+        await meeting.save();
+        if( meeting.participants.length === 1){
+            await userService.addUserToken(meeting.createdBy, req.appTokenApiKey,Math.floor((meeting.originalCost +1)/2));
+        } else if(meeting.participants.length === 5){
+            await userService.addUserToken(meeting.createdBy, req.appTokenApiKey,meeting.originalCost);
+        }
+        res.json(meeting);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
     }
 };
 
@@ -101,6 +127,6 @@ exports.reverseGeocode = async (req,res) =>{
         const address = await meetService.reverseGeocode(lat,lng);
         res.send({address:address});
     } catch (err){
-        res.status(500).json({ error: err.message });   
+        return res.status(500).json({ error: err.message });   
     }
 }

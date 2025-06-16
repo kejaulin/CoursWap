@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const meetSchema = new mongoose.Schema({
     summary: String,
+    matiere: String,
     startDateTime: Date,
     endDateTime: Date,
     createdBy: {
@@ -20,7 +21,17 @@ const meetSchema = new mongoose.Schema({
     eventId: {
         type: String,
         required: true
-    }
+    },
+    rejoinCost: {
+        type: Number,
+        required: true
+    },    
+    originalCost: {
+        type: Number,
+        required: true
+    },  
+    participants: [], 
+    keywords: []
 })
 
 module.exports = mongoose.model('meetings', meetSchema);

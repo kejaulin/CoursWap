@@ -4,7 +4,7 @@ const oneToOneEventController = require('../controllers/OneToOneControllers');
 
 /**
  * @swagger
- * /api/onetooneevents/create:
+ * /onetooneevents/create:
  *   post:
  *     summary: Crée un rendez-vous
  *     requestBody:
@@ -30,7 +30,7 @@ router.post('/create', oneToOneEventController.createOneToOneEvent);
 
 /**
  * @swagger
- * /api/onetooneevents/my-meetings:
+ * /onetooneevents/my-meetings:
  *   get:
  *     summary: Liste des rendez-vous de l'utilisateur
  *     responses:
@@ -41,7 +41,7 @@ router.get('/my-meetings', oneToOneEventController.getMyOneToOneEvent);
 
 /**
  * @swagger
- * /api/onetooneevents/{id}:
+ * /onetooneevents/{id}:
  *   delete:
  *     summary: Supprime une réunion
  *     parameters:

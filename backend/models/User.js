@@ -13,7 +13,7 @@ const userSchema = new Schema({
     matiere: String, 
     disponibilites: Array, 
     photo: String, 
-    meetingLocations: [{key:String, location: { lat: Number, lng: Number }}], 
+    meetingLocations: [{key:String, location: { street: String, city: String, postalCode: String, country: String, formattedAddress:String, lat: Number, lng: Number }}], 
 });
 
 module.exports = mongoose.model('users',userSchema);

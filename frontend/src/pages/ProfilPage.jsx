@@ -5,18 +5,19 @@ import { toast, ToastContainer } from 'react-toastify';
 import EspaceProf from '../component/EspaceProf';
 import EspaceEtu from '../component/EspaceEtu';
 import {useNavigate} from 'react-router-dom';
+import AddressForm from '../component/AddressForm';
 
 function ProfilPage() {
   const [nom, setNom] = useState("");
   const [matiere, setMatiere] = useState("");
   const [photo, setPhoto] = useState(null);
   const genererDisponibilites = () => {
-  return Array.from({ length: 6 }, (_, i) => ({
-    date: moment().add(i, 'days').format("DD/MM/YYYY"),
-    creneaux: []
-  }));
-};
-const [dispos, setDispos] = useState(genererDisponibilites());
+    return Array.from({ length: 6 }, (_, i) => ({
+      date: moment().add(i, 'days').format("DD/MM/YYYY"),
+      creneaux: []
+    }));
+  };
+  const [dispos, setDispos] = useState(genererDisponibilites());
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -40,7 +41,6 @@ const [dispos, setDispos] = useState(genererDisponibilites());
     fetch("/api/users/me", { credentials: "include" })
       .then(res => res.json())
       .then(data => {
-        console.log("user connecté:", data);
         setProfil(data);
         setLoading(false);
         // Si profil déjà créé (nom ET role présents), => pas de form
@@ -189,6 +189,12 @@ const [dispos, setDispos] = useState(genererDisponibilites());
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+      <div>
+        <label className="block font-semibold mb-2">Lieu de rendez-vous en présentiel:</label>
+        <div className="overflow-x-auto">
+          <AddressForm userId={user._id} />
         </div>
       </div>
       <button

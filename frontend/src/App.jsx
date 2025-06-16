@@ -18,7 +18,6 @@ function App() {
           <Routes>
             <Route path="/" element={<MainPage/>} />
             <Route path="/profs/:id" element={<ContactProfesseur />} />
-            <Route path="/creer-meeting" element={<CreateMeetingPage />} />
             <Route path="/profil" element={<ProfilPage />} />
           </Routes>
         :
