@@ -237,6 +237,60 @@ function ProfilPage() {
     </form>
   );
 
+  // Ajoute ce state pour gérer l'upload vidéo
+const [videoFile, setVideoFile] = useState(null);
+const [videoTitle, setVideoTitle] = useState('');
+const [videoCategory, setVideoCategory] = useState('');
+const [uploading, setUploading] = useState(false);
+const [uploadError, setUploadError] = useState('');
+const [uploadSuccess, setUploadSuccess] = useState('');
+const [myVideos, setMyVideos] = useState([]);
+
+// Charger les vidéos de l'utilisateur (prof)
+useEffect(() => {
+  if (role === "professeur" && user?._id) {
+    fetch(`/api/videos/user/${user._id}`)
+      .then(res => res.json())
+      .then(setMyVideos)
+      .catch(() => setMyVideos([]));
+  }
+}, [role, user]);
+
+const handleVideoUpload = async (e) => {
+  e.preventDefault();
+  setUploading(true);
+  setUploadError('');
+  setUploadSuccess('');
+  try {
+    const formData = new FormData();
+    formData.append('video', videoFile);
+    formData.append('title', videoTitle);
+    formData.append('category', videoCategory);
+
+    const res = await fetch('/api/videos/upload', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include'
+    });
+    if (res.ok) {
+      setUploadSuccess('Vidéo envoyée avec succès !');
+      setVideoFile(null);
+      setVideoTitle('');
+      setVideoCategory('');
+      // Recharge la liste
+      fetch(`/videos/user/${user._id}`)
+        .then(res => res.json())
+        .then(setMyVideos);
+    } else {
+      const err = await res.json();
+      setUploadError(err.error || 'Erreur lors de l\'upload');
+    }
+  } catch {
+    setUploadError('Erreur réseau');
+  }
+  setUploading(false);
+};
+
 return (
   <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-8 mt-8">
     <ToastContainer />
@@ -268,9 +322,58 @@ return (
       )}
     </>
     )}
+    {/* Ajoute ce JSX dans le return, par exemple juste avant <EspaceProf ... /> */}
+    {role === "professeur" && (
+  <div className="mb-8">
+    <h3 className="text-xl font-bold mb-2 text-purple-700">Uploader une vidéo</h3>
+    <form onSubmit={handleVideoUpload} className="flex flex-col gap-2 mb-4">
+      <input
+        type="file"
+        accept="video/*"
+        onChange={e => setVideoFile(e.target.files[0])}
+        required
+      />
+      <input
+        type="text"
+        placeholder="Titre de la vidéo"
+        value={videoTitle}
+        onChange={e => setVideoTitle(e.target.value)}
+        className="border rounded-lg p-2"
+        required
+      />
+      <input
+        type="text"
+        placeholder="Catégorie"
+        value={videoCategory}
+        onChange={e => setVideoCategory(e.target.value)}
+        className="border rounded-lg p-2"
+        required
+      />
+      <button
+        type="submit"
+        disabled={uploading}
+        className="bg-purple-500 text-white py-2 px-4 rounded-xl font-semibold hover:bg-purple-600"
+      >
+        {uploading ? "Envoi..." : "Envoyer"}
+      </button>
+      {uploadError && <div className="text-red-500">{uploadError}</div>}
+      {uploadSuccess && <div className="text-green-600">{uploadSuccess}</div>}
+    </form>
+    <h4 className="font-semibold mb-2">Mes vidéos</h4>
+    <ul>
+      {myVideos.map(v => (
+        <li key={v._id} className="mb-2">
+          <span className="font-bold">{v.title}</span> ({v.category})<br />
+          <video src={`/api/videos/${v._id}/stream`} controls width={320} className="mt-1" />
+        </li>
+      ))}
+      {myVideos.length === 0 && <li>Aucune vidéo envoyée.</li>}
+    </ul>
+  </div>
+)}
   </div>
 );
 
 }
 
-export default ProfilPage ; 
+export default ProfilPage ;

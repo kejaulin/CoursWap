@@ -84,3 +84,6 @@ app.use('/onetooneevents', oneToOneEventRoutes );
 
 const calendarRoutes = require('./routes/calendarRoutes');
 app.use('/calendar', calendarRoutes);
+
+const videoRoutes = require('./routes/videoRoutes');
+app.use('/videos', videoRoutes);
