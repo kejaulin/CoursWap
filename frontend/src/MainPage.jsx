@@ -3,6 +3,8 @@ import { useAuth } from './component/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 
 function MainPage(){
+    const Base_URL = import.meta.env.VITE_BASE_URL;
+    const Backend_Port = import.meta.env.VITE_BACKEND_PORT;
 
     const { user, logout } = useAuth();
 
@@ -84,7 +86,7 @@ function MainPage(){
           onClick={() => navigate(`/profs/${prof._id}`)}
         >
           <img
-            src={`http://localhost:4000${prof.photo}`}
+            src={(Base_URL)?`${Base_URL}:${Backend_Port}${prof.photo}`:`http://localhost:4000${prof.photo}`}
             alt={prof.nom}
             className="w-20 h-20 object-cover rounded-full mb-2 border-2 border-purple-300"
           />

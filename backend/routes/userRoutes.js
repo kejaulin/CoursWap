@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const User = require('../models/User');
-const userControllers = require('../controllers/userControlleurs');
+const userControllers = require('../controllers/userController');
 
 //Gestion des images 
 const path = require('path');
@@ -23,12 +22,14 @@ function ensureAuth(req, res, next) {
   if (req.user) return next();
   res.status(401).json({ success: false, error: "Non authentifié" });
 }
+
 /**
  * @swagger
  * /api/users/register:
  *   post:
  *     summary: Enregistre ou met à jour un utilisateur connecté
- *     tags: [Utilisateurs]
+ *     tags:
+ *       - Users
  *     consumes:
  *       - multipart/form-data
  *     parameters:
@@ -40,17 +41,17 @@ function ensureAuth(req, res, next) {
  *       200:
  *         description: Utilisateur enregistré ou mis à jour
  */
-router.post('/register', ensureAuth, upload.single('photo'), userControllers.register);
+router.post('/register', ensureAuth, upload.single('photo'), userControllers.registerUser);
 
 /**
  * @swagger
  * /api/users/me:
  *   get:
  *     summary: Récupère les infos de l'utilisateur connecté
- *     tags: [Utilisateurs]
+ *     tags:
+ *       - Users
  *     responses:
  *       200:
- * 
  *         description: Données utilisateur
  */
 router.get('/me', userControllers.getMe);
@@ -60,7 +61,8 @@ router.get('/me', userControllers.getMe);
  * /api/users:
  *   get:
  *     summary: Récupère tous les professeurs
- *     tags: [Utilisateurs]
+ *     tags:
+ *       - Users
  */
 router.get('/', userControllers.getAllProfs);
 
@@ -69,7 +71,8 @@ router.get('/', userControllers.getAllProfs);
  * /api/users/{id}:
  *   get:
  *     summary: Récupère un professeur par ID
- *     tags: [Utilisateurs]
+ *     tags:
+ *       - Users
  *     parameters:
  *       - in: path
  *         name: id
@@ -84,7 +87,8 @@ router.get('/:id', userControllers.getProfById);
  * /api/users/{id}/disponibilites:
  *   put:
  *     summary: Met à jour les disponibilités du professeur
- *     tags: [Utilisateurs]
+ *     tags:
+ *       - Users
  *     parameters:
  *       - in: path
  *         name: id
@@ -102,4 +106,5 @@ router.get('/:id', userControllers.getProfById);
  *               type: string
  */
 router.put('/:id/disponibilites', ensureAuth, userControllers.updateDisponibilites);
+
 module.exports = router;

@@ -4,7 +4,7 @@ const statsController = require('../controllers/statsControllers');
 
 /**
  * @swagger
- * /api/stats:
+ * /api/stats/onetooneevents:
  *   get:
  *     summary: Récupère les statistiques des rendez-vous par professeurs et étudiants
  *     tags:
@@ -40,9 +40,9 @@ const statsController = require('../controllers/statsControllers');
  *                         type: integer
  *                         description: Nombre total de créneaux
  *       500:
- *         description: Erreur serveur
+ *         description: Erreur du serveur
  */
-router.get('/', statsController.getStats);
+router.get('/onetooneevents', statsController.getStats);
 
 
 module.exports = router;

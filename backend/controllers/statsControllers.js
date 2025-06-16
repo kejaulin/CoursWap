@@ -1,6 +1,4 @@
-const User = require('../models/User');
 const OneToOneEvent = require('../models/OneToOneEvent');
-const statsService = require('../services/statsService');
 
 exports.getStats = async (req, res) => {
   try {

@@ -1,7 +1,7 @@
 const path = require('path');
 const userService = require('../services/userService');
 
-exports.register = async (req, res) => {
+exports.registerUser = async (req, res) => {
   try {
     const email = req.user.email;
     const { nom, role, matiere, disponibilites } = req.body;

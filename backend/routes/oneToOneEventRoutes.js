@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const OneToOneEvent = require('../models/OneToOneEvent');
 const oneToOneEventController = require('../controllers/OneToOneControllers');
-
 
 /**
  * @swagger
@@ -41,8 +39,6 @@ router.post('/create', oneToOneEventController.createOneToOneEvent);
  */
 router.get('/my-meetings', oneToOneEventController.getMyOneToOneEvent);
 
-
-
 /**
  * @swagger
  * /api/onetooneevents/{id}:
@@ -59,6 +55,5 @@ router.get('/my-meetings', oneToOneEventController.getMyOneToOneEvent);
  *         description: Réunion supprimée
  */
 router.delete('/:id', oneToOneEventController.deleteOneToOneEvent);
-
 
 module.exports = router;
