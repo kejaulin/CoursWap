@@ -5,6 +5,8 @@ import LiveButton from './component/LiveButton';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 
 function MainPage(){
+    const Base_URL = import.meta.env.VITE_BASE_URL;
+    const Backend_Port = import.meta.env.VITE_BACKEND_PORT;
 
     const { user, logout } = useAuth();
 
@@ -96,14 +98,14 @@ function MainPage(){
         : [];
 
     const scroll = (direction) => {
-        if (scrollRef.current) {
-            const scrollAmount = scrollRef.current.offsetWidth * 0.8;
-            scrollRef.current.scrollBy({
-                left: direction === 'left' ? -scrollAmount : scrollAmount,
-                behavior: 'smooth',
-            });
-        }
-    };
+          if (scrollRef.current) {
+              const scrollAmount = scrollRef.current.offsetWidth * 0.8;
+              scrollRef.current.scrollBy({
+                  left: direction === 'left' ? -scrollAmount : scrollAmount,
+                  behavior: 'smooth',
+              });
+          }
+      }
 
     return (
         <>
@@ -129,7 +131,7 @@ function MainPage(){
                                             onClick={() => navigate(`/profs/${prof._id}`)}
                                         >
                                             <img
-                                                src={prof.photo}
+                                                src={(Base_URL)?`${Base_URL}:${Backend_Port}${prof.photo}`:`http://localhost:4000${prof.photo}`}
                                                 alt={prof.nom}
                                                 className="w-20 h-20 object-cover rounded-full mb-2 border-2 border-purple-300"
                                             />

@@ -1,77 +1,113 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const userControllers = require('../controllers/userController');
 const User = require('../models/User');
-const userController = require('../controllers/userController');
 const useAppTokenApiKey  = require('../middleware/tokenApiMiddleware');
 
-const upload = multer({ dest: 'uploads/' });
+//Gestion des images 
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    // Garde l'extension d'origine
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + Date.now() + ext);
+  }
+});
+const upload = multer({ storage });
+
 // Middleware d'auth pour être sûr que req.user existe (sinon erreur 401)
 function ensureAuth(req, res, next) {
   if (req.user) return next();
   return res.status(401).json({ success: false, error: "Non authentifié" });
 }
 
-router.post('/register', ensureAuth, upload.single('photo'), userController.registerUser);
+/**
+ * @swagger
+ * /api/users/register:
+ *   post:
+ *     summary: Enregistre ou met à jour un utilisateur connecté
+ *     tags:
+ *       - Users
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: photo
+ *         type: file
+ *         description: Photo de profil
+ *     responses:
+ *       200:
+ *         description: Utilisateur enregistré ou mis à jour
+ */
+router.post('/register', ensureAuth, upload.single('photo'), userControllers.registerUser);
 
+/**
+ * @swagger
+ * /api/users/me:
+ *   get:
+ *     summary: Récupère les infos de l'utilisateur connecté
+ *     tags:
+ *       - Users
+ *     responses:
+ *       200:
+ *         description: Données utilisateur
+ */
+router.get('/me', userControllers.getMe);
 
-router.get('/me', (req, res) => {
-  if (req.user) {
-    res.json(req.user);
-  } else {
-    return res.status(401).json({ error: "Non authentifié" });
-  }
-});
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Récupère tous les professeurs
+ *     tags:
+ *       - Users
+ */
+router.get('/', userControllers.getAllProfs);
 
-// Obtenir tous les professeurs
-router.get('/', async (req, res) => {
-  try {
-    const profs = await User.find({ role: "professeur" });
-    res.json(profs);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Récupère un professeur par ID
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ */
+router.get('/:id', userControllers.getProfById);
 
-// Obtenir un professeur par ID
-
-router.get('/:id', async (req, res) => {
-  try {
-    const prof = await User.findOne({ _id: req.params.id, role: "professeur" });
-    if (!prof) {
-      return res.status(404).json({ message: 'Professeur non trouvé' });
-    }
-    return res.json(prof);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-// Mettre à jour les disponibilités d'un professeur
-router.put('/:id/disponibilites', ensureAuth, async (req, res) => {
-  try {
-    const { id } = req.params; 
-    const { date, creneau } = req.body;
-
-    const user = await User.findById(id);
-    if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
-
-    user.disponibilites = user.disponibilites.map(d => {
-      if (d.date === date) {
-        return {
-          ...d,
-          creneaux: d.creneaux.filter(c => c !== creneau)
-        };
-      }
-      return d;
-    });
-
-    await user.save();
-
-    res.json({ success: true, disponibilites: user.disponibilites });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
+/**
+ * @swagger
+ * /api/users/{id}/disponibilites:
+ *   put:
+ *     summary: Met à jour les disponibilités du professeur
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: body
+ *         name: body
+ *         schema:
+ *           type: object
+ *           properties:
+ *             date:
+ *               type: string
+ *             creneau:
+ *               type: string
+ */
+router.put('/:id/disponibilites', ensureAuth, userControllers.updateDisponibilites);
 
 /**
  * @swagger
@@ -139,7 +175,7 @@ router.put('/:id/disponibilites', ensureAuth, async (req, res) => {
  *                   type: string
  *                   example: Message d'erreur
  */
-router.get('/:id/addresses', userController.profAddresses);
+router.get('/:id/addresses', userControllers.profAddresses);
 
 /**
  * @swagger
@@ -202,7 +238,7 @@ router.get('/:id/addresses', userController.profAddresses);
  *       500:
  *         description: Erreur serveur
  */
-router.put('/:id/saveaddresses', userController.geocode );
+router.put('/:id/saveaddresses', userControllers.geocode );
 
 /**
  * @swagger
@@ -251,7 +287,7 @@ router.put('/:id/saveaddresses', userController.geocode );
  *                   type: string
  *                   example: Une erreur est survenue lors de la récupération du solde
  */
-router.get('/:id/tokens',useAppTokenApiKey, userController.getUserCurrentTokenAmount);
+router.get('/:id/tokens',useAppTokenApiKey, userControllers.getUserCurrentTokenAmount);
 
 /**
  * @swagger
@@ -303,6 +339,6 @@ router.get('/:id/tokens',useAppTokenApiKey, userController.getUserCurrentTokenAm
  *                   type: string
  *                   example: Erreur lors de la soustraction des tokens
  */
-router.post('/:id/tokens/subtract',useAppTokenApiKey, userController.substractUserToken);
+router.post('/:id/tokens/subtract',useAppTokenApiKey, userControllers.substractUserToken);
 
 module.exports = router;
