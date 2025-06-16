@@ -10,13 +10,14 @@ function ProfilPage() {
   const [nom, setNom] = useState("");
   const [matiere, setMatiere] = useState("");
   const [photo, setPhoto] = useState(null);
-  const [dispos, setDispos] = useState(
-    // Initialiser les disponibilités pour les 7 prochains jours
-    Array.from({ length: 6 }, (_, i) => ({
-      date: moment().add(i, 'days').format("DD/MM/YYYY"),
-      creneaux: []
-    }))
-  );
+  const genererDisponibilites = () => {
+  return Array.from({ length: 6 }, (_, i) => ({
+    date: moment().add(i, 'days').format("DD/MM/YYYY"),
+    creneaux: []
+  }));
+};
+const [dispos, setDispos] = useState(genererDisponibilites());
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [allCourses, setAllCourses] = useState([]);
@@ -48,13 +49,17 @@ function ProfilPage() {
           setNom(data.nom);
           setMatiere(data.matiere || "");
           // Si le profil est professeur, on charge les disponibilités
-          if (data.role === "professeur" && data.disponibilites) {
-            setDispos(data.disponibilites);
-          }
-          setProfilCree(true);
+          if (data.role === "professeur") {
+          const joursAvenir = genererDisponibilites();
+
+          const fusion = joursAvenir.map(jour => {
+          const existant = data.disponibilites?.find(d => d.date === jour.date);
+          
+          return existant ? { ...jour, creneaux: existant.creneaux } : jour;
+          });
+          setDispos(fusion);}
         }
       })
-
       .finally(() => setLoading(false));
   }, []);
 
