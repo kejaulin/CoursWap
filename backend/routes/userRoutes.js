@@ -3,48 +3,16 @@ const router = express.Router();
 const multer = require('multer');
 const User = require('../models/User');
 const userController = require('../controllers/userController');
+const useAppTokenApiKey  = require('../middleware/tokenApiMiddleware');
 
 const upload = multer({ dest: 'uploads/' });
-
 // Middleware d'auth pour être sûr que req.user existe (sinon erreur 401)
 function ensureAuth(req, res, next) {
   if (req.user) return next();
   return res.status(401).json({ success: false, error: "Non authentifié" });
 }
 
-router.post('/register', ensureAuth, upload.single('photo'), async (req, res) => {
-  try {
-    // Récupère l’email de l’utilisateur connecté (Google)
-    const email = req.user.email;
-    const { nom, role, matiere, disponibilites } = req.body;
-    let updateFields = { nom, role, email };
-    if (req.file) updateFields.photo = `/uploads/${req.file.filename}`;
-    if (role === 'professeur') {
-      updateFields.matiere = matiere;
-      updateFields.disponibilites = JSON.parse(disponibilites);
-    }
-
-    //  vérifie si le user existe déjà par email
-    let user = await User.findOne({ email });
-
-    if (user) {
-      // Il existe, on met à jour
-      user = await User.findOneAndUpdate(
-        { email },
-        { $set: updateFields },
-        { new: true }
-      );
-    } else {
-      // Sinon, on le crée
-      user = new User(updateFields);
-      await user.save();
-    }
-
-    return res.status(200).json({ success: true, user });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message });
-  }
-});
+router.post('/register', ensureAuth, upload.single('photo'), userController.registerUser);
 
 
 router.get('/me', (req, res) => {
@@ -171,17 +139,7 @@ router.put('/:id/disponibilites', ensureAuth, async (req, res) => {
  *                   type: string
  *                   example: Message d'erreur
  */
-router.get('/:id/addresses', async (req, res) => {
-  try {
-    const profAddresses = await User.findOne({ _id: req.params.id}).select({meetingLocations:1, _id:0});
-    if (!profAddresses.meetingLocations) {
-      return res.status(404).json({ message: 'Aucune adresse trouvée pour ce professeur' });
-    }
-    return res.json(profAddresses);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
+router.get('/:id/addresses', userController.profAddresses);
 
 /**
  * @swagger
@@ -245,5 +203,106 @@ router.get('/:id/addresses', async (req, res) => {
  *         description: Erreur serveur
  */
 router.put('/:id/saveaddresses', userController.geocode );
+
+/**
+ * @swagger
+ * /users/{id}/tokens:
+ *   get:
+ *     summary: Obtenir le nombre actuel de tokens d’un utilisateur
+ *     description: Cette route retourne le solde actuel de tokens d’un utilisateur spécifique, en utilisant la clé d'API de l'application.
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Identifiant de l’utilisateur
+ *     responses:
+ *       200:
+ *         description: Solde actuel des tokens de l’utilisateur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: integer
+ *               example: 10
+ *       404:
+ *         description: Utilisateur non trouvé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur du serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: Une erreur est survenue lors de la récupération du solde
+ */
+router.get('/:id/tokens',useAppTokenApiKey, userController.getUserCurrentTokenAmount);
+
+/**
+ * @swagger
+ * /users/{id}/tokens/subtract:
+ *   post:
+ *     summary: Soustraire un nombre de tokens à un utilisateur
+ *     description: Cette route permet de retirer un certain nombre de tokens à un utilisateur identifié.
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Identifiant de l’utilisateur
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - amount
+ *             properties:
+ *               amount:
+ *                 type: integer
+ *                 description: Nombre de tokens à retirer
+ *                 example: 5
+ *     responses:
+ *       200:
+ *         description: Nouveau solde de tokens après soustraction
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: integer
+ *               example: 10
+ *       500:
+ *         description: Erreur du serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: Erreur lors de la soustraction des tokens
+ */
+router.post('/:id/tokens/subtract',useAppTokenApiKey, userController.substractUserToken);
 
 module.exports = router;

@@ -3,6 +3,8 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+const App = require('../models/App');
+const authService = require('./authService');
 const User = mongoose.model('users');
 
 passport.serializeUser((user, done) => {
@@ -26,16 +28,32 @@ passport.use(
       prompt: 'consent',
       passReqToCallback: true,
     },
-    (req,accessToken, refreshToken, profile, done) => {
-      User.findOne({ googleId: profile.id }).then(existingUser => {
+    async (req, accessToken, refreshToken, profile, done) => {
+      try {
+        const existingUser = await User.findOne({ googleId: profile.id });
+
         if (existingUser) {
-          done(null, existingUser);
-        } else {
-          new User({ googleId: profile.id,accessToken: accessToken,authMethod: 'google', email: profile.emails[0].value, refreshToken: refreshToken })
-            .save()
-            .then(user => done(null, user));
+          return done(null, existingUser);
         }
-      });
+
+        const newUser = await new User({
+          googleId: profile.id,
+          accessToken,
+          refreshToken,
+          authMethod: 'google',
+          email: profile.emails[0].value,
+        }).save();
+
+        const app = await App.findOne({ name: 'CoursWap' }).select({ tokenAPIKey: 1, _id: 0 });
+
+        if (app) {
+          await authService.subscribeToTokenAPI(newUser, app.tokenAPIKey);
+        }
+
+        done(null, newUser);
+      } catch (err) {
+        done(err, null);
+      }
     }
   )
 );
