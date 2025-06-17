@@ -1,5 +1,3 @@
-
-
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { useState, useEffect } from 'react';
@@ -30,29 +28,10 @@ function ContactProfesseur() {
     location:'',
     profId:id
   });
+  const [myVideos, setMyVideos] = useState([]);
+  const [openVideo, setOpenVideo] = useState(null);
   const navigate = useNavigate();
 
-//  Definition des video de demo 
-  const videosDemo = [
-  {
-    titre: "Résolution d’équation",
-    description: "Description du contenu de la vidéo.",
-    img: "",
-    time: "15 min"
-  },
-  {
-    titre: "Probabilité",
-    description: "Description du contenu de la vidéo.",
-    img: "",
-    time: "20 min"
-  },
-  {
-    titre: "Suites",
-    description: "Description du contenu de la vidéo.",
-    img: "",
-    time: "28 min"
-  }
-];
  
  
   const { user, logout } = useAuth();
@@ -67,6 +46,15 @@ function ContactProfesseur() {
       .then(data => setProf(data))
       .catch(err => console.error('Erreur de récupération du professeur :', err));
   }, [id]);
+
+  useEffect(() => {
+    if (user?._id) {
+      fetch(`/api/videos/user/${user._id}`)
+        .then(res => res.json())
+        .then(setMyVideos)
+        .catch(() => setMyVideos([]));
+    }
+  }, [user]);
 
   // Gestion des champs du formulaire
   const handleChange = (e) => {
@@ -307,17 +295,44 @@ function ContactProfesseur() {
  
       <section className="max-w-2xl mx-auto mt-6">
         <h3 className="text-xl font-semibold mb-4 text-purple-700">Vidéos de {prof.nom} :</h3>
-        {videosDemo.map((vid, idx) => (
-          <div key={idx} className="flex items-center gap-4 bg-white rounded-2xl shadow-md p-4 mb-4">
-            <img src={vid.img || "https://via.placeholder.com/56"} alt="" className="w-14 h-14 rounded-xl bg-gray-100 object-cover" />
-            <div className="flex-1">
-              <div className="font-bold">{vid.titre}</div>
-              <div className="text-sm text-gray-600">{vid.description}</div>
-              <div className="text-xs text-gray-400 mt-1">Today • {vid.time}</div>
+        {myVideos.map((vid, idx) => (
+          <div
+            key={idx}
+            className="flex items-center gap-4 bg-white rounded-2xl shadow-md p-4 mb-4 cursor-pointer hover:bg-purple-50 transition"
+            onClick={() => setOpenVideo(vid)}
+          >
+            {/* Miniature ou icône */}
+            <div className="w-32 h-20 bg-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
+              <span className="text-4xl text-purple-400">&#9654;</span>
             </div>
-            <button className="text-3xl text-purple-400 hover:text-purple-600 transition">&#9654;</button>
+            <div className="flex-1">
+              <div className="font-bold">{vid.title}</div>
+              <div className="text-sm text-gray-600">{vid.category}</div>
+              <div className="text-xs text-gray-400 mt-1">Today • {vid.time} || 'rien'</div>
+            </div>
           </div>
         ))}
+
+        {/* Modal vidéo */}
+        {openVideo && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+            <div className="bg-white rounded-2xl p-6 shadow-lg relative max-w-2xl w-full flex flex-col items-center">
+              <button
+                className="absolute top-2 right-4 text-3xl text-purple-400 hover:text-purple-600 font-bold"
+                onClick={() => setOpenVideo(null)}
+                aria-label="Fermer"
+              >&times;</button>
+              <h4 className="font-bold text-lg mb-2">{openVideo.title}</h4>
+              <video
+                src={`/api/videos/${openVideo._id}/stream`}
+                controls
+                autoPlay
+                className="rounded-xl w-full max-h-[60vh] bg-black"
+              />
+              <div className="text-sm text-gray-600 mt-2">{openVideo.category}</div>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );
