@@ -23,25 +23,151 @@ const upload = multer({
   })
 });
 
-// Upload vidéo
+/**
+ * @swagger
+ * /videos/upload:
+ *   post:
+ *     summary: Upload d'une nouvelle vidéo
+ *     tags: [Videos]
+ *     consumes:
+ *       - multipart/form-data
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               video:
+ *                 type: string
+ *                 format: binary
+ *               title:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Vidéo uploadée avec succès
+ *       400:
+ *         description: Aucun fichier envoyé
+ *       401:
+ *         description: Non authentifié
+ */
 router.post('/upload', ensureAuth, upload.single('video'), videoController.uploadVideo);
 
-// Liste toutes les vidéos
+/**
+ * @swagger
+ * /videos:
+ *   get:
+ *     summary: Liste toutes les vidéos
+ *     tags: [Videos]
+ *     responses:
+ *       200:
+ *         description: Liste des vidéos
+ */
 router.get('/', videoController.listAllVideos);
 
-// Liste les vidéos d'un utilisateur
+/**
+ * @swagger
+ * /videos/user/{userId}:
+ *   get:
+ *     summary: Liste les vidéos d'un utilisateur
+ *     tags: [Videos]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID de l'utilisateur
+ *     responses:
+ *       200:
+ *         description: Liste des vidéos de l'utilisateur
+ */
 router.get('/user/:userId', videoController.listUserVideos);
 
-// Liste les vidéos d'une catégorie
+/**
+ * @swagger
+ * /videos/category/{category}:
+ *   get:
+ *     summary: Liste les vidéos d'une catégorie
+ *     tags: [Videos]
+ *     parameters:
+ *       - in: path
+ *         name: category
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Catégorie de la vidéo
+ *     responses:
+ *       200:
+ *         description: Liste des vidéos de la catégorie
+ */
 router.get('/category/:category', videoController.listCategoryVideos);
 
-// Lire les infos d'une vidéo
+/**
+ * @swagger
+ * /videos/{id}:
+ *   get:
+ *     summary: Obtenir les infos d'une vidéo
+ *     tags: [Videos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID de la vidéo
+ *     responses:
+ *       200:
+ *         description: Infos de la vidéo
+ *       404:
+ *         description: Vidéo non trouvée
+ */
 router.get('/:id', videoController.getVideo);
 
-// Stream vidéo
+/**
+ * @swagger
+ * /videos/{id}/stream:
+ *   get:
+ *     summary: Streamer une vidéo
+ *     tags: [Videos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID de la vidéo
+ *     responses:
+ *       200:
+ *         description: Flux vidéo (stream)
+ *       404:
+ *         description: Vidéo non trouvée
+ */
 router.get('/:id/stream', videoController.streamVideo);
 
-// Supprimer une vidéo
+/**
+ * @swagger
+ * /videos/{id}:
+ *   delete:
+ *     summary: Supprimer une vidéo
+ *     tags: [Videos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID de la vidéo
+ *     responses:
+ *       200:
+ *         description: Vidéo supprimée
+ *       401:
+ *         description: Non authentifié
+ *       404:
+ *         description: Vidéo non trouvée
+ */
 router.delete('/:id', ensureAuth, videoController.deleteVideo);
 
 module.exports = router;
