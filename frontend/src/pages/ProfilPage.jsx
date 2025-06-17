@@ -48,6 +48,7 @@ function ProfilPage() {
           setRole(data.role);
           setNom(data.nom);
           setMatiere(data.matiere || "");
+          setProfilCree(true);
           // Si le profil est professeur, on charge les disponibilités
           if (data.role === "professeur") {
           const joursAvenir = genererDisponibilites();

@@ -33,7 +33,7 @@ function CreateMeetingPage({ onMeetingCreated }) {
         if (start) {
             setDisableLiveCreation(false);
             const startDate = new Date(start);
-            const endDate = new Date(startDate.getTime() + 30 * 60000); // +30min
+            const endDate = new Date(startDate.getTime() + 60 * 60000); // +60min
             // Format pour input datetime-local
             const pad = n => n.toString().padStart(2, '0');
             const local = `${startDate.getFullYear()}-${pad(startDate.getMonth()+1)}-${pad(startDate.getDate())}T${pad(startDate.getHours())}:${pad(startDate.getMinutes())}`;
@@ -138,7 +138,7 @@ function CreateMeetingPage({ onMeetingCreated }) {
                             </div>
                         </div>
                         <div>
-                            <label className="block font-semibold">Fin (automatique +30min)</label>
+                            <label className="block font-semibold">Fin (automatique +60min)</label>
                             <input
                                 type="datetime-local"
                                 value={endDateTime}

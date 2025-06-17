@@ -11,6 +11,15 @@ function Header() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+    }).then(() => {
+      navigate(0);
+    });
+  };
+
   useEffect(() => {
     if (!user?._id) return;
 
@@ -55,15 +64,6 @@ function Header() {
       }
     };
   }, [user]);
-
-  const handleLogout = () => {
-    fetch('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include',
-    }).then(() => {
-      navigate('/');
-    });
-  };
 
   return (
     <header className="flex justify-between items-center p-2 shadow-md h-20">

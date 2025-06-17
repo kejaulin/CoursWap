@@ -69,10 +69,10 @@ exports.userLogout = (req,res) =>{
   try {
     req.logout(() => {
       req.session.destroy(() => {
-        res.clearCookie('connect.sid');
-        res.status(200).json({ message: 'Déconnexion réussie' });
+        res.redirect('/');
       });
     });
+    res.send(req.user);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

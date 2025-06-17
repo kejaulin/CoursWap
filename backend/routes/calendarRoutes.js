@@ -95,7 +95,7 @@ router.post('/google', calendarController.addGoogleCalendarEvent);
  *               type: string
  *               format: binary
  *       400:
- *         description: Requête invalide (ex: données manquantes)
+ *         description: Requête invalide (données manquantes)
  *       404:
  *         description: Professeur introuvable
  *       500:
