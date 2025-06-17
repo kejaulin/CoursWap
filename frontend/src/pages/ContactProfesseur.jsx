@@ -42,7 +42,6 @@ function ContactProfesseur() {
 		location: '',
 		profId: id
 	});
-	const navigate = useNavigate();
 
 	const { user, logout } = useAuth();
 	const provider = user?.authMethod || 'local';
