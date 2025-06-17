@@ -127,5 +127,7 @@ app.use('/onetooneevents', oneToOneEventRoutes );
 
 app.use('/calendar', calendarRoutes);
 
-app.use('/stats', statsRoutes);
+const videoRoutes = require('./routes/videoRoutes');
+app.use('/videos', videoRoutes);
 
+app.use('/stats', statsRoutes);
