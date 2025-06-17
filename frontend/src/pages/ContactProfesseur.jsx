@@ -118,7 +118,6 @@ function ContactProfesseur() {
 			const oneToOneEventData = {
 				etudiantId: user._id,
 				profId: formData.profId,
-				oneToOneEventId,
 				date: dateISO,
 				heure: creneau,
 				mode: formData.mode,
