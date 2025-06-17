@@ -1,6 +1,43 @@
+const User = require('../models/User');
 const addressCache = require('../models/addressCache');
 
 const userService = {
+    async registerOrUpdateUser(email, userData){
+        let user = await User.findOne({ email });
+        if (user) {
+            user = await User.findOneAndUpdate({ email }, { $set: userData }, { new: true });
+        } else {
+            user = new User(userData);
+            await user.save();
+        }
+        return user;
+    },
+  
+    async getProfById(id) {
+        return await User.findOne({ _id: id, role: "professeur" });
+    },
+  
+    async getAllProfs() {
+        return await User.find({ role: "professeur" });
+    },
+  
+    async updateDisponibilites(id, date, creneau) {
+        const user = await User.findById(id);
+        if (!user) throw new Error('Utilisateur non trouvé');
+
+        user.disponibilites = user.disponibilites.map(d => {
+            if (d.date === date) {
+                return {
+                  ...d,
+                  creneaux: d.creneaux.filter(c => c !== creneau)
+                };
+            }
+            return d;
+        });
+
+        await user.save();
+        return user.disponibilites;
+    },
 
     async geocode(addresse) {
         const originalAddress  = [addresse.street, addresse.city,addresse.postalCode, addresse.country].filter(Boolean).map(s => s.trim()).join(', ');
@@ -39,7 +76,32 @@ const userService = {
             }
             throw err;
         }
-       
+    },
+
+    async getUserCurrentTokenAmount(user, apiKey) {
+        const userId = user._id;
+        const userTokenInfos = await fetch(`http://token-api-environment.eba-etwtnpg2.eu-west-1.elasticbeanstalk.com/api/tokens/${userId}`,
+            { method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey } }).then(res =>{ return res.json()});
+        return userTokenInfos.tokens;
+    },
+
+    async substractUserToken(userId, apiKey,amount) {
+        const newUserTokenAmount = await fetch(`http://token-api-environment.eba-etwtnpg2.eu-west-1.elasticbeanstalk.com/api/tokens/${userId}/subtract`,
+            { method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+            body: JSON.stringify({ amount: amount })
+         }).then(res =>{ return res.json()});
+        return newUserTokenAmount.tokens;
+    },
+
+    async addUserToken(userId, apiKey,amount) {
+        const newUserTokenAmount = await fetch(`http://token-api-environment.eba-etwtnpg2.eu-west-1.elasticbeanstalk.com/api/tokens/${userId}/add`,
+            { method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+            body: JSON.stringify({ amount: amount })
+         }).then(res =>{ return res.json()});
+        return newUserTokenAmount.tokens;
     },
 };
 

@@ -1,10 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const userControllers = require('../controllers/userController');
 const User = require('../models/User');
-const userController = require('../controllers/userController');
+const useAppTokenApiKey  = require('../middleware/tokenApiMiddleware');
 
-const upload = multer({ dest: 'uploads/' });
+//Gestion des images 
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    // Garde l'extension d'origine
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + Date.now() + ext);
+  }
+});
+const upload = multer({ storage });
 
 // Middleware d'auth pour être sûr que req.user existe (sinon erreur 401)
 function ensureAuth(req, res, next) {
@@ -12,98 +25,89 @@ function ensureAuth(req, res, next) {
   return res.status(401).json({ success: false, error: "Non authentifié" });
 }
 
-router.post('/register', ensureAuth, upload.single('photo'), async (req, res) => {
-  try {
-    // Récupère l’email de l’utilisateur connecté (Google)
-    const email = req.user.email;
-    const { nom, role, matiere, disponibilites } = req.body;
-    let updateFields = { nom, role, email };
-    if (req.file) updateFields.photo = `/uploads/${req.file.filename}`;
-    if (role === 'professeur') {
-      updateFields.matiere = matiere;
-      updateFields.disponibilites = JSON.parse(disponibilites);
-    }
+/**
+ * @swagger
+ * /api/users/register:
+ *   post:
+ *     summary: Enregistre ou met à jour un utilisateur connecté
+ *     tags:
+ *       - Users
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: photo
+ *         type: file
+ *         description: Photo de profil
+ *     responses:
+ *       200:
+ *         description: Utilisateur enregistré ou mis à jour
+ */
+router.post('/register', ensureAuth, upload.single('photo'), userControllers.registerUser);
 
-    //  vérifie si le user existe déjà par email
-    let user = await User.findOne({ email });
+/**
+ * @swagger
+ * /api/users/me:
+ *   get:
+ *     summary: Récupère les infos de l'utilisateur connecté
+ *     tags:
+ *       - Users
+ *     responses:
+ *       200:
+ *         description: Données utilisateur
+ */
+router.get('/me', userControllers.getMe);
 
-    if (user) {
-      // Il existe, on met à jour
-      user = await User.findOneAndUpdate(
-        { email },
-        { $set: updateFields },
-        { new: true }
-      );
-    } else {
-      // Sinon, on le crée
-      user = new User(updateFields);
-      await user.save();
-    }
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Récupère tous les professeurs
+ *     tags:
+ *       - Users
+ */
+router.get('/', userControllers.getAllProfs);
 
-    return res.status(200).json({ success: true, user });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message });
-  }
-});
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Récupère un professeur par ID
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ */
+router.get('/:id', userControllers.getProfById);
 
-
-router.get('/me', (req, res) => {
-  if (req.user) {
-    res.json(req.user);
-  } else {
-    return res.status(401).json({ error: "Non authentifié" });
-  }
-});
-
-// Obtenir tous les professeurs
-router.get('/', async (req, res) => {
-  try {
-    const profs = await User.find({ role: "professeur" });
-    res.json(profs);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// Obtenir un professeur par ID
-
-router.get('/:id', async (req, res) => {
-  try {
-    const prof = await User.findOne({ _id: req.params.id, role: "professeur" });
-    if (!prof) {
-      return res.status(404).json({ message: 'Professeur non trouvé' });
-    }
-    return res.json(prof);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-// Mettre à jour les disponibilités d'un professeur
-router.put('/:id/disponibilites', ensureAuth, async (req, res) => {
-  try {
-    const { id } = req.params; 
-    const { date, creneau } = req.body;
-
-    const user = await User.findById(id);
-    if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
-
-    user.disponibilites = user.disponibilites.map(d => {
-      if (d.date === date) {
-        return {
-          ...d,
-          creneaux: d.creneaux.filter(c => c !== creneau)
-        };
-      }
-      return d;
-    });
-
-    await user.save();
-
-    res.json({ success: true, disponibilites: user.disponibilites });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
+/**
+ * @swagger
+ * /api/users/{id}/disponibilites:
+ *   put:
+ *     summary: Met à jour les disponibilités du professeur
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: body
+ *         name: body
+ *         schema:
+ *           type: object
+ *           properties:
+ *             date:
+ *               type: string
+ *             creneau:
+ *               type: string
+ */
+router.put('/:id/disponibilites', ensureAuth, userControllers.updateDisponibilites);
 
 /**
  * @swagger
@@ -171,17 +175,7 @@ router.put('/:id/disponibilites', ensureAuth, async (req, res) => {
  *                   type: string
  *                   example: Message d'erreur
  */
-router.get('/:id/addresses', async (req, res) => {
-  try {
-    const profAddresses = await User.findOne({ _id: req.params.id}).select({meetingLocations:1, _id:0});
-    if (!profAddresses.meetingLocations) {
-      return res.status(404).json({ message: 'Aucune adresse trouvée pour ce professeur' });
-    }
-    return res.json(profAddresses);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
+router.get('/:id/addresses', userControllers.profAddresses);
 
 /**
  * @swagger
@@ -244,6 +238,107 @@ router.get('/:id/addresses', async (req, res) => {
  *       500:
  *         description: Erreur serveur
  */
-router.put('/:id/saveaddresses', userController.geocode );
+router.put('/:id/saveaddresses', userControllers.geocode );
+
+/**
+ * @swagger
+ * /users/{id}/tokens:
+ *   get:
+ *     summary: Obtenir le nombre actuel de tokens d’un utilisateur
+ *     description: Cette route retourne le solde actuel de tokens d’un utilisateur spécifique, en utilisant la clé d'API de l'application.
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Identifiant de l’utilisateur
+ *     responses:
+ *       200:
+ *         description: Solde actuel des tokens de l’utilisateur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: integer
+ *               example: 10
+ *       404:
+ *         description: Utilisateur non trouvé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur du serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: Une erreur est survenue lors de la récupération du solde
+ */
+router.get('/:id/tokens',useAppTokenApiKey, userControllers.getUserCurrentTokenAmount);
+
+/**
+ * @swagger
+ * /users/{id}/tokens/subtract:
+ *   post:
+ *     summary: Soustraire un nombre de tokens à un utilisateur
+ *     description: Cette route permet de retirer un certain nombre de tokens à un utilisateur identifié.
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Identifiant de l’utilisateur
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - amount
+ *             properties:
+ *               amount:
+ *                 type: integer
+ *                 description: Nombre de tokens à retirer
+ *                 example: 5
+ *     responses:
+ *       200:
+ *         description: Nouveau solde de tokens après soustraction
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: integer
+ *               example: 10
+ *       500:
+ *         description: Erreur du serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: Erreur lors de la soustraction des tokens
+ */
+router.post('/:id/tokens/subtract',useAppTokenApiKey, userControllers.substractUserToken);
 
 module.exports = router;

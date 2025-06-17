@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const User = mongoose.model('users');
 
+const authService = require('../services/authService');
+const App = require('../models/App');
+
 exports.googleAuthenticate = (req,res,next) =>{
     try{
         console.log('Google authentication initiated');
@@ -35,6 +38,8 @@ exports.userRegister = async (req,res) =>{
 
         const hashedPassword = await bcrypt.hash(password,10);
         const user = await User.create({email,password:hashedPassword,authMethod:'local',role:'etudiant'});
+        //Souscription à la token API
+        await authService.subscribeToTokenAPI(user,req.appTokenApiKey);
         req.logIn(user, err => {
             if(err) return res.status(500).send('Erreur de session');
             res.send({success: true});
@@ -61,21 +66,30 @@ exports.userLocalLogin = (req,res,next) => {
 }
     
 exports.userLogout = (req,res) =>{
-    try{
-        req.logout(() => {
-            req.session.destroy(() => {
-                res.redirect('/');
-            });
-        });
-        res.send(req.user);
-    } catch (err){
-        return res.status(500).json({ error: err.message });   
-    }
+  try {
+    req.logout(() => {
+      req.session.destroy(() => {
+        res.redirect('/');
+      });
+    });
+    res.send(req.user);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 }
 
 exports.getCurrentUser = (req,res) =>{
     try{
         res.send(req.user || {});
+    } catch (err){
+        return res.status(500).json({ error: err.message });   
+    }
+}
+
+exports.getAppInfos = async (req,res) => {
+    try{
+        const appInfos = await App.find();
+        res.send(appInfos);
     } catch (err){
         return res.status(500).json({ error: err.message });   
     }

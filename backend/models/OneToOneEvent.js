@@ -12,7 +12,6 @@ const oneToOneEventSchema = new Schema({
         ref: 'users',
         required: true
     },
-    oneToOneEventId: { type: String, required: true },
     date: { type: Date, required: true },
     heure: { type: String, required: true }, 
     mode: { type: String, enum: ['visio', 'presentiel'], required: true },

@@ -59,9 +59,15 @@ exports.addIcalEvent = async (req,res,next) =>{
     try{
         const formData = req.body;
 
-        const [startHour, endHour] = formData.disponibilites.split(' - ');
-        const startDateTime = moment(`${formData.date}T${startHour}`);
-        const durationMs =  moment.duration(moment(`${formData.date}T${endHour}`).diff(startDateTime));
+        const [datePart, timePart] = formData.disponibilites.split(' ');
+        const isoDate = convertDateToISO(datePart);  // conversion ici
+
+        const [startHour, endHour] = timePart.split('-').map(s => s.trim());
+
+        const startDateTime = moment(`${isoDate}T${startHour}:00`);
+        const endDateTime = moment(`${isoDate}T${endHour}:00`);
+
+        const durationMs =  moment.duration(endDateTime.diff(startDateTime));
         
         const prof = await fetch(`http://localhost:4000/professeurs/${formData.profId}`)
         .then(res => {
