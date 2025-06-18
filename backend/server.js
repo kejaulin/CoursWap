@@ -18,7 +18,10 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const app = express();
 const path = require('path');
 
-const PORT = process.env.SERVER_PORT;
+const PORT = process.env.PORT || 4000;
+const FRONT_PORT = process.env.FRONT_PORT || 3000;
+const FRONT_URL =  process.env.FRONT_URL || "http://localhost";
+const BACK_URL =  process.env.BACK_URL || "http://localhost";
 
 const meetRoutes = require('./routes/meetRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -41,14 +44,15 @@ const io = new Server(server,{
 });
 app.set('io', io);
 
-mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
+const mongoUri = process.env.MONGO_URI || 'mongodb://localhost/cours-wap-bdd';
+mongoose.connect(mongoUri).then(() => {
     console.log('Connected to MongoDB.');
   }).catch(error => {
     console.error(error);
 });
 
 app.use(bodyParser.json());
-app.use(cors({origin:'http://localhost:3000',
+app.use(cors({origin:`${FRONT_URL}:${FRONT_PORT}`,
   methods: "GET,POST,PUT,DELETE",
   credentials:true}));
 
@@ -73,11 +77,6 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'Documentation de l’API CoursWap',
     },
-    servers: [
-      {
-        url: `http://localhost:${PORT}`,
-      },
-    ],
   },
   apis: ['./routes/*.js'],
 };
@@ -107,12 +106,12 @@ io.on('connection', (socket) => {
 
 server.listen(PORT, async () => {
   console.log(`Server listening on port ${PORT}.`);
-  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+  console.log(`Swagger docs available at ${BACK_URL}:${PORT}/api-docs`);
   // App first initialization
   const savedApp = await MyApp.findOne({name: "CoursWap"});
   if (!savedApp) {
       const tokenAPIKey = await tokenService.getAPIKey();
-      const myApp = new MyApp({name: "CoursWap", tokenAPIKey: tokenAPIKey, tokenRegeneratedDate: new Date().now()});
+      const myApp = new MyApp({name: "CoursWap", tokenAPIKey: tokenAPIKey, tokenRegeneratedDate: new Date()});
       myApp.save();
   } 
   // --------

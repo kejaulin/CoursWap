@@ -5,6 +5,10 @@ const User = mongoose.model('users');
 
 const authService = require('../services/authService');
 const App = require('../models/App');
+require("dotenv").config();
+
+const PORT = process.env.PORT || 4000;
+const BACK_URL =  process.env.BACK_URL || "http://localhost";
 
 exports.googleAuthenticate = (req,res,next) =>{
     try{
@@ -23,7 +27,7 @@ exports.googleCallback = (req,res,next) =>{
     try{
         passport.authenticate('google',{
             failureRedirect:'/auth/google',
-            successRedirect:'http://localhost:3000'})(req, res, next);
+            successRedirect:`${BACK_URL}:${PORT}`})(req, res, next);
     } catch (err){
         next(err);
         return res.status(500).json({ error: err.message });   

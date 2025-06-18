@@ -27,7 +27,7 @@ function ensureAuth(req, res, next) {
 
 /**
  * @swagger
- * /api/users/register:
+ * /users/register:
  *   post:
  *     summary: Enregistre ou met à jour un utilisateur connecté
  *     tags:
@@ -47,7 +47,7 @@ router.post('/register', ensureAuth, upload.single('photo'), userControllers.reg
 
 /**
  * @swagger
- * /api/users/me:
+ * /users/me:
  *   get:
  *     summary: Récupère les infos de l'utilisateur connecté
  *     tags:
@@ -60,7 +60,7 @@ router.get('/me', userControllers.getMe);
 
 /**
  * @swagger
- * /api/users:
+ * /users:
  *   get:
  *     summary: Récupère tous les professeurs
  *     tags:
@@ -70,7 +70,7 @@ router.get('/', userControllers.getAllProfs);
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /users/{id}:
  *   get:
  *     summary: Récupère un professeur par ID
  *     tags:
@@ -86,7 +86,7 @@ router.get('/:id', userControllers.getProfById);
 
 /**
  * @swagger
- * /api/users/{id}/disponibilites:
+ * /users/{id}/disponibilites:
  *   put:
  *     summary: Met à jour les disponibilités du professeur
  *     tags:

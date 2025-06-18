@@ -6,6 +6,11 @@ const { createEvent} = require('ics');
 require('dotenv').config();
 
 
+const PORT = process.env.PORT || 4000;
+const FRONT_PORT = process.env.FRONT_PORT || 3000;
+const FRONT_URL =  process.env.FRONT_URL || "http://localhost";
+const BACK_URL =  process.env.BACK_URL || "http://localhost";
+
 function convertDateToISO(dateStr) {
   const [day, month, year] = dateStr.split('/');
   return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
@@ -69,7 +74,7 @@ exports.addIcalEvent = async (req,res,next) =>{
 
         const durationMs =  moment.duration(endDateTime.diff(startDateTime));
         
-        const prof = await fetch(`http://localhost:4000/professeurs/${formData.profId}`)
+        const prof = await fetch(`${BACK_URL}:${PORT}/professeurs/${formData.profId}`)
         .then(res => {
           if (!res.ok) throw new Error("404");
           return res.json();
@@ -79,7 +84,7 @@ exports.addIcalEvent = async (req,res,next) =>{
           title: `Cours de ${formData.chapitres} avec ${prof.nom}`,
           description: `Cours pour la classe ${formData.classe}`,
           start:[startDateTime.year(),startDateTime.month()+1,startDateTime.date(),startDateTime.hour(),startDateTime.minute()], //[YYYY, M, D, H, M]
-          url: 'http://localhost:3000',
+          url: `${FRONT_URL}:${FRONT_PORT}`,
           organizer:{ name: 'CoursWap'},
           startOutputType: 'local',
           duration:{ hours: durationMs.hours(), minutes: durationMs.minutes() },

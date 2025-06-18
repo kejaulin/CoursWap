@@ -4,7 +4,7 @@ const statsController = require('../controllers/statsControllers');
 
 /**
  * @swagger
- * /api/stats/onetooneevents:
+ * /stats/onetooneevents:
  *   get:
  *     summary: Récupère les statistiques des rendez-vous par professeurs et étudiants
  *     tags:
