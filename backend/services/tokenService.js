@@ -2,6 +2,7 @@ const App = require('../models/App');
 require('dotenv').config();
 
 const PLATFORM_NAME = process.env.PLATFORM_NAME || "CoursWap";
+const BACK_URL =  process.env.BACK_URL || "http://localhost";
 const APP_Config = PLATFORM_NAME == "CoursWap" 
 ? {
     name: "CoursWap",
@@ -22,7 +23,8 @@ const APP_Config = PLATFORM_NAME == "CoursWap"
         days: 0,
         hours: 0,
         mins: 3
-    }
+    },
+    webhookUrl: BACK_URL+"/tokens/webhook"
   };
 
 const tokenService = {
@@ -42,8 +44,8 @@ const tokenService = {
         }
     },
 
-    async handleTokensRegenerated(appId, regeneratedAt){
-        await App.findOneAndUpdate( { appId },
+    async handleTokensRegenerated(appName, regeneratedAt){
+        await App.findOneAndUpdate( { name: appName },
             { $set: {tokenRegeneratedDate: regeneratedAt} },
             { new: true });        
     }

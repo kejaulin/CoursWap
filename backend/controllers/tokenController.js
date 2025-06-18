@@ -1,9 +1,10 @@
 const tokenService = require('../services/tokenService');
+const App = require('../models/App');
 
 exports.webhookInfos = async (req, res) => {
-  const { event, appId, regeneratedAt } = req.body;
+  const { event, appName, regeneratedAt } = req.body;
 
-  if (!event || !appId || !regeneratedAt) {
+  if (!event || !appName || !regeneratedAt) {
     return res.status(400).json({ error: 'Payload invalide ou incomplet' });
   }
 
@@ -11,10 +12,11 @@ exports.webhookInfos = async (req, res) => {
     if (event === 'tokens_regenerated') {
       console.log(`[WEBHOOK] Tokens régénéré à ${regeneratedAt}`);
 
-      await tokenService.handleTokensRegenerated(appId, regeneratedAt);
+      await tokenService.handleTokensRegenerated(appName, regeneratedAt);
 
+      const app = await App.findOne({ name: appName });
       const io = req.app.get('io');
-      io.to(appId).emit('tokens_regenerated', { regeneratedAt });
+      io.to(app._id).emit('tokens_regenerated', { regeneratedAt });
 
       return res.status(200).json({ success: true });
     }
