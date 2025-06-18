@@ -1,0 +1,8 @@
+[build]
+command = "npm run build"    # La commande que Netlify va lancer pour construire ton site
+publish = "dist"             # Le dossier qui sera déployé (les fichiers statiques après build)
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
