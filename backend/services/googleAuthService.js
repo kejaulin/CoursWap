@@ -2,10 +2,11 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const mongoose = require('mongoose');
 require('dotenv').config();
-
 const App = require('../models/App');
 const authService = require('./authService');
 const User = mongoose.model('users');
+
+const PLATFORM_NAME = process.env.PLATFORM_NAME || "CoursWap";
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -44,7 +45,7 @@ passport.use(
           email: profile.emails[0].value,
         }).save();
 
-        const app = await App.findOne({ name: 'CoursWap' }).select({ tokenAPIKey: 1, _id: 0 });
+        const app = await App.findOne({ name: PLATFORM_NAME }).select({ tokenAPIKey: 1, _id: 0 });
 
         if (app) {
           await authService.subscribeToTokenAPI(newUser, app.tokenAPIKey);

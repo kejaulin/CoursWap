@@ -22,6 +22,7 @@ const PORT = process.env.PORT || 4000;
 const FRONT_PORT = process.env.FRONT_PORT || 3000;
 const FRONT_URL =  process.env.FRONT_URL || "http://localhost";
 const BACK_URL =  process.env.BACK_URL || "http://localhost";
+const PLATFORM_NAME = process.env.PLATFORM_NAME || "CoursWap";
 
 const meetRoutes = require('./routes/meetRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -108,10 +109,10 @@ server.listen(PORT, async () => {
   console.log(`Server listening on port ${PORT}.`);
   console.log(`Swagger docs available at ${BACK_URL}:${PORT}/api-docs`);
   // App first initialization
-  const savedApp = await MyApp.findOne({name: "CoursWap"});
+  const savedApp = await MyApp.findOne({name: PLATFORM_NAME});
   if (!savedApp) {
       const tokenAPIKey = await tokenService.getAPIKey();
-      const myApp = new MyApp({name: "CoursWap", tokenAPIKey: tokenAPIKey, tokenRegeneratedDate: new Date()});
+      const myApp = new MyApp({name: PLATFORM_NAME, tokenAPIKey: tokenAPIKey, tokenRegeneratedDate: new Date()});
       myApp.save();
   } 
   // --------
