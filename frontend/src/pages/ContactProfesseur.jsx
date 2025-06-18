@@ -4,8 +4,7 @@ import { useAuth } from '../component/AuthProvider';
 import GMAP from '../component/gMap';
 
 function ContactProfesseur() {
-  const Base_URL = import.meta.env.VITE_BASE_URL;
-  const Backend_Port = import.meta.env.VITE_BACKEND_PORT;
+  const Server_URL = import.meta.env.VITE_SERVER_URL;
 
   const [myVideos, setMyVideos] = useState([]);
   const [openVideo, setOpenVideo] = useState(null);
@@ -206,7 +205,7 @@ function ContactProfesseur() {
           </button>
         </div>
         <img
-          src={(Base_URL)?`${Base_URL}:${Backend_Port}${prof.photo}`:`http://localhost:4000${prof.photo}`}
+          src={(Server_URL)?`${Server_URL}${prof.photo}`:`http://localhost:4000${prof.photo}`}
           alt={`Photo de ${prof.nom}`}
           className="w-32 h-32 rounded-2xl object-cover shadow-md" />
 				<div className="flex flex-col gap-1 flex-1 ml-0 md:ml-6">
