@@ -66,12 +66,12 @@ function MainPage(){
         return (
             <div className="font-sans flex flex-col items-center">
                 <section className="w-full h-50 mt-5 mb-1 flex items-center justify-center">
-                    <img src="./../img/appLogo.png" alt="Courswap Logo" className="w-auto h-full" />
+                    <img src="/img/appLogo.png" alt="Courswap Logo" className="w-auto h-full" />
                 </section>
                 <section className="bg-purple-200 rounded-3xl p-6 m-4 flex flex-col md:flex-row items-center justify-between w-2/3">
                     <div className="md:w-2/3 space-y-4">
                         <h2 className="text-2xl md:text-xl font-bold uppercase">Apprendre ensemble, gratuitement et sans limites !</h2>
-                        <img src="../img/studentWorking.png" alt="Students Studying" className="md:w-9/10 md:h-full rounded-xl mt-6 md:mt-0" />
+                        <img src="/img/studentWorking.png" alt="Students Studying" className="md:w-9/10 md:h-full rounded-xl mt-6 md:mt-0" />
                     </div>
                     <div className="md:w-1/3 space-y-4">
                         <p className="text-justify">Bienvenue sur Courswap, la plateforme collaborative qui révolutionne l'apprentissage ! Ici, le partage de connaissances est sans barrières ni frais : élèves, étudiants et passionnés se retrouvent pour échanger, apprendre et progresser ensemble. Rejoignez-nous pour découvrir un espace où l'entraide fait la force et où chaque cours est une opportunité de grandir.</p>
@@ -205,7 +205,7 @@ function MainPage(){
                                                             {(meet.createdBy._id !== user._id && !meet.participants.includes(user._id)) && (
                                                                 <div className="flex items-center bg-orange-100 text-orange-700 font-semibold rounded-xl px-2 py-1 w-fit">
                                                                     <span className='pr-1'>Coût :</span>
-                                                                    <img src="./../img/token.png" alt="SwapTokens logo" className="w-5 h-5" />
+                                                                    <img src="/img/token.png" alt="SwapTokens logo" className="w-5 h-5" />
                                                                     <span className='pl-1'>{meet.rejoinCost}</span>
                                                                 </div>    
                                                             )}

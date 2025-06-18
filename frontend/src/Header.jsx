@@ -68,7 +68,7 @@ function Header() {
   return (
     <header className="flex justify-between items-center p-2 shadow-md h-20">
       <div className="flex items-center space-x-2 h-full">
-        <img onClick={() => navigate("/")} src="./../img/appLogo.png" alt="Courswap Logo" className="object-cover w-full h-full hover:cursor-pointer" />
+        <img onClick={() => navigate("/")} src="/img/appLogo.png" alt="Courswap Logo" className="object-cover w-full h-full hover:cursor-pointer" />
       </div>
       <div className="flex justify-between items-center px-6 py-3 bg-white">
         {!user ? (
@@ -83,7 +83,7 @@ function Header() {
         ) : (
           <>
             <div className="flex items-center gap-2 bg-orange-100 text-orange-700 font-semibold rounded-xl px-4 py-2">
-              <img src="./../img/token.png" alt="SwapTokens logo" className="w-5 h-5" />
+              <img src="/img/token.png" alt="SwapTokens logo" className="w-5 h-5" />
               <span className="hidden sm:inline whitespace-nowrap">SwapTokens:</span>
               <span>{tokens}</span>
             </div>

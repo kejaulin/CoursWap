@@ -197,7 +197,7 @@ function CreateMeetingPage({ onMeetingCreated }) {
                                     <>
                                         <span>Créer le live</span>
                                         <div className="flex items-center bg-orange-100 text-orange-700 font-semibold rounded-xl px-2 py-1 w-fit">
-                                            <img src="./../img/token.png" alt="SwapTokens logo" className="w-5 h-5" />
+                                            <img src="/img/token.png" alt="SwapTokens logo" className="w-5 h-5" />
                                             <span className='pl-1'>{livePrice}</span>
                                         </div>
                                     </>

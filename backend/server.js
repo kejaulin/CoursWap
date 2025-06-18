@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
 
 server.listen(PORT, async () => {
   console.log(`Server listening on port ${PORT}.`);
-  console.log(`Swagger docs available at ${BACK_URL}:${PORT}/api-docs`);
+  console.log(`Swagger documentations available at ${BACK_URL}:${PORT}/api-docs`);
   // App first initialization
   const savedApp = await MyApp.findOne({name: PLATFORM_NAME});
   if (!savedApp) {
