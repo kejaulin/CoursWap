@@ -7,6 +7,7 @@ const authService = require('./authService');
 const User = mongoose.model('users');
 
 const PLATFORM_NAME = process.env.PLATFORM_NAME || "CoursWap";
+const DEV_ENV = process.env.DEV_ENV || "http://localhost:4000";
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -24,7 +25,7 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       authorizationURL: 'https://accounts.google.com/o/oauth2/v2/auth',
-      callbackURL: '/auth/google/callback',
+      callbackURL: `${DEV_ENV}/auth/google/callback`,
       accessType: 'offline',
       prompt: 'consent',
       passReqToCallback: true,

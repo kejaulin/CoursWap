@@ -19,8 +19,7 @@ const app = express();
 const path = require('path');
 
 const PORT = process.env.PORT || 4000;
-const FRONT_PORT = process.env.FRONT_PORT || 3000;
-const FRONT_URL =  process.env.FRONT_URL || "http://localhost";
+const FRONT_URL =  process.env.FRONT_URL || "http://localhost:3000";
 const BACK_URL =  process.env.BACK_URL || "http://localhost";
 const PLATFORM_NAME = process.env.PLATFORM_NAME || "CoursWap";
 
@@ -53,7 +52,7 @@ mongoose.connect(mongoUri).then(() => {
 });
 
 app.use(bodyParser.json());
-app.use(cors({origin:`${FRONT_URL}:${FRONT_PORT}`,
+app.use(cors({origin:FRONT_URL,
   methods: "GET,POST,PUT,DELETE",
   credentials:true}));
 

@@ -9,6 +9,7 @@ require("dotenv").config();
 
 const PORT = process.env.PORT || 4000;
 const BACK_URL =  process.env.BACK_URL || "http://localhost";
+const FRONT_URL =  process.env.FRONT_URL || "http://localhost:3000";
 
 exports.googleAuthenticate = (req,res,next) =>{
     try{
@@ -26,8 +27,8 @@ exports.googleAuthenticate = (req,res,next) =>{
 exports.googleCallback = (req,res,next) =>{
     try{
         passport.authenticate('google',{
-            failureRedirect:'/auth/google',
-            successRedirect:`${BACK_URL}:${PORT}`})(req, res, next);
+            failureRedirect:`${BACK_URL}:${PORT}/auth/google`,
+            successRedirect:FRONT_URL})(req, res, next);
     } catch (err){
         next(err);
         return res.status(500).json({ error: err.message });   

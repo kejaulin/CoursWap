@@ -7,8 +7,7 @@ require('dotenv').config();
 
 
 const PORT = process.env.PORT || 4000;
-const FRONT_PORT = process.env.FRONT_PORT || 3000;
-const FRONT_URL =  process.env.FRONT_URL || "http://localhost";
+const FRONT_URL =  process.env.FRONT_URL || "http://localhost:3000";
 const BACK_URL =  process.env.BACK_URL || "http://localhost";
 
 function convertDateToISO(dateStr) {
@@ -84,7 +83,7 @@ exports.addIcalEvent = async (req,res,next) =>{
           title: `Cours de ${formData.chapitres} avec ${prof.nom}`,
           description: `Cours pour la classe ${formData.classe}`,
           start:[startDateTime.year(),startDateTime.month()+1,startDateTime.date(),startDateTime.hour(),startDateTime.minute()], //[YYYY, M, D, H, M]
-          url: `${FRONT_URL}:${FRONT_PORT}`,
+          url: FRONT_URL,
           organizer:{ name: 'CoursWap'},
           startOutputType: 'local',
           duration:{ hours: durationMs.hours(), minutes: durationMs.minutes() },

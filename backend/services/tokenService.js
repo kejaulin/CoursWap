@@ -2,7 +2,7 @@ const App = require('../models/App');
 require('dotenv').config();
 
 const PLATFORM_NAME = process.env.PLATFORM_NAME || "CoursWap";
-const BACK_URL =  process.env.BACK_URL || "http://localhost";
+const DEV_ENV = process.env.DEV_ENV || "http://localhost:4000";
 const APP_Config = PLATFORM_NAME == "CoursWap" 
 ? {
     name: "CoursWap",
@@ -24,7 +24,7 @@ const APP_Config = PLATFORM_NAME == "CoursWap"
         hours: 0,
         mins: 3
     },
-    webhookUrl: BACK_URL+"/tokens/webhook"
+    webhookUrl: DEV_ENV+"/tokens/webhook"
   };
 
 const tokenService = {
