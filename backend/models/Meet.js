@@ -5,6 +5,7 @@ const meetSchema = new mongoose.Schema({
     matiere: String,
     startDateTime: Date,
     endDateTime: Date,
+    imageUrl: String,
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
@@ -31,7 +32,7 @@ const meetSchema = new mongoose.Schema({
         required: true
     },  
     participants: [], 
-    keywords: []
+    keywords: String,
 })
 
 module.exports = mongoose.model('meetings', meetSchema);

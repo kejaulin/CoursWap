@@ -112,7 +112,7 @@ server.listen(PORT, async () => {
   const savedApp = await MyApp.findOne({name: "CoursWap"});
   if (!savedApp) {
       const tokenAPIKey = await tokenService.getAPIKey();
-      const myApp = new MyApp({name: "CoursWap", tokenAPIKey: tokenAPIKey, tokenRegeneratedDate: new Date().now()});
+      const myApp = new MyApp({name: "CoursWap", tokenAPIKey: tokenAPIKey, tokenRegeneratedDate:  Date.now()});
       myApp.save();
   } 
   // --------
