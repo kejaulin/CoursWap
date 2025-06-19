@@ -2,7 +2,7 @@ const App = require('../models/App');
 
 async function useAppTokenApiKey(req, res, next) {
   try {
-    const app = await App.findOne({ name: "CoursWap" }).select({ tokenAPIKey: 1, _id: 0 });
+    const app = await App.findOne({ name: "CoursWapFreddy" }).select({ tokenAPIKey: 1, _id: 0 });
 
     if (!app) {
       return res.status(404).json({ error: 'App not found' });

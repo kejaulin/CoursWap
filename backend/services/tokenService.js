@@ -10,7 +10,7 @@ const tokenService = {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    name: "CoursWap",
+                    name: "CoursWapFreddy",
                     max_token_value: 15,
                     min_token_value: 0,
                     token_regeneration_time: {

@@ -11,14 +11,6 @@ function ContactProfesseur() {
   const [openVideo, setOpenVideo] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (user?._id) {
-      fetch(`/api/videos/user/${user._id}`)
-        .then(res => res.json())
-        .then(setMyVideos)
-        .catch(() => setMyVideos([]));
-    }
-  }, [user]);
   
 	const calendarActions = {
 		google: {
@@ -57,6 +49,13 @@ function ContactProfesseur() {
 			.then(data => setProf(data))
 			.catch(err => console.error('Erreur de récupération du professeur :', err));
 	}, [id]);
+
+  useEffect(() => {
+      fetch(`/api/videos/user/${id}`)
+        .then(res => res.json())
+        .then(setMyVideos)
+        .catch(() => setMyVideos([]));
+  }, [id]);
 
 	useEffect(() => {
 		if (user) {
@@ -336,7 +335,6 @@ function ContactProfesseur() {
             <div className="flex-1">
               <div className="font-bold">{vid.title}</div>
               <div className="text-sm text-gray-600">{vid.category}</div>
-              <div className="text-xs text-gray-400 mt-1">Today • {vid.time} || 'rien'</div>
             </div>
           </div>
         ))}

@@ -41,11 +41,19 @@ exports.addGoogleCalendarEvent = async (req,res,next) =>{
         },
       };
       if(formData.location && formData.location !== '') event.location = formData.location;
-
+      if (formData.mode === 'visio'){
+        event.conferenceData = {
+          createRequest: {
+            requestId: Math.random().toString(36).substring(2, 15),
+            conferenceSolutionKey: { type: 'hangoutsMeet' },
+          },
+        };
+      }
       const calendar = google.calendar({version: 'v3',auth:auth});
       calendar.events.insert({
             calendarId: 'primary',
             resource: event,
+            conferenceDataVersion: 1,
       });
 
       res.send({success: true});

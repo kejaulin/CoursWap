@@ -2,9 +2,10 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuth } from './component/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import LiveButton from './component/LiveButton';
+import VideoUploadButton from './component/VideoUploadButton';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 
-function MainPage(){
+function MainPage() {
     const Base_URL = import.meta.env.VITE_BASE_URL;
     const Backend_Port = import.meta.env.VITE_BACKEND_PORT;
 
@@ -15,6 +16,8 @@ function MainPage(){
     const [meetings, setMeetings] = useState([]);
     const [allProfesseurs, setAllProfesseurs] = useState([]);
     const [tokens, setTokens] = useState(0);
+    const [AllVideos, setAllVideos] = useState([]);
+    const [openVideo, setOpenVideo] = useState(null); // Ajout du state pour la popup vidéo
     const navigate = useNavigate();
     const scrollRef = useRef(null);
 
@@ -30,6 +33,10 @@ function MainPage(){
         fetch('/api/meetings')
             .then(res => res.json())
             .then(data => setMeetings(data));
+        
+        fetch('/api/videos')
+            .then(res => res.json())
+            .then(data => setAllVideos(data));
     }, []);
 
     useEffect(() => {
@@ -43,7 +50,7 @@ function MainPage(){
     }, [user]);
 
     const handleMeetingJoin = async (meet) => {
-        if(meet.createdBy._id !== user._id && !meet.participants.includes(user._id)) {
+        if(meet.createdBy !== user._id && !meet.participants.includes(user._id)) {
             if (tokens < meet.rejoinCost) {e.preventDefault(); return}
             else if (tokens >= meet.rejoinCost){
                 const res = await fetch(`/api/users/${user._id}/tokens/subtract`, {
@@ -93,23 +100,32 @@ function MainPage(){
         ? meetings.filter(meet => meet.matiere === selectedSubject)
         : [];
 
+    const filteredVideos = selectedSubject
+        ? AllVideos.filter(video => video.category === selectedSubject)
+        : [];
+
     const profsFiltres = selectedSubject
         ? allProfesseurs.filter(prof => prof.matiere === selectedSubject)
         : [];
 
     const scroll = (direction) => {
-          if (scrollRef.current) {
-              const scrollAmount = scrollRef.current.offsetWidth * 0.8;
-              scrollRef.current.scrollBy({
-                  left: direction === 'left' ? -scrollAmount : scrollAmount,
-                  behavior: 'smooth',
-              });
-          }
-      }
+        if (scrollRef.current) {
+            const scrollAmount = scrollRef.current.offsetWidth * 0.8;
+            scrollRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth',
+            });
+        }
+    }
 
     return (
         <>
-            {user.role === 'professeur' && <LiveButton />}
+            {user.role === 'professeur' && (
+                <>
+                    <LiveButton />
+                    <VideoUploadButton />
+                </>
+            )}
             <div className="font-sans flex flex-col items-center">
                 <section className="bg-purple-200 rounded-3xl p-6 m-4 mb-0.5 flex flex-col md:flex-row items-center justify-left w-9/10 space-x-2">
                     {allCourses.map((course, index) => {
@@ -143,6 +159,72 @@ function MainPage(){
                         </section>
                         <section className="bg-purple-200 rounded-3xl p-6 m-4 mb-0.5 flex flex-col items-flex-start justify-left w-full">
                             <h4 className="text-2xl font-semibold mb-4">Les dernières vidéos de {selectedSubject} &#8680;</h4>
+                            <div className="relative w-full">
+                                <button
+                                    onClick={() => scroll('left')}
+                                    className="absolute left-0 top-1/2 transform -translate-y-1/2 z-100 bg-white shadow-md p-2 rounded-full hover:bg-gray-100 transition"
+                                >
+                                    <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
+                                </button>
+
+                                <div
+                                    ref={scrollRef}
+                                    className="flex overflow-x-auto gap-4 py-4 px-2 scroll-smooth"
+                                    style ={{scrollbarWidth: "none", msOverflowStyle: "none"}}>
+
+                                    <ul className="flex display-inline space-x-4">
+                                        {filteredVideos.length === 0 && (
+                                            <li>Aucune vidéos pour ce thème.</li>
+                                        )}
+                                        {filteredVideos.map((video, index) => (
+                                            <li
+                                                key={video._id}
+                                                className="mb-2 cursor-pointer hover:bg-purple-50 rounded-xl transition"
+                                                onClick={() => setOpenVideo(video)}
+                                            >
+                                                <div className="w-32 h-20 bg-gray-200 rounded-xl flex items-center justify-center overflow-hidden mb-2">
+                                                    <span className="text-4xl text-purple-400">&#9654;</span>
+                                                </div>
+                                                <div className="font-bold">{video.title}</div>
+                                                <div className="text-sm text-gray-600">{video.category}</div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                
+                                <button
+                                    onClick={() => scroll('right')}
+                                    className="absolute right-0 top-1/2 transform -translate-y-1/2 z-100 bg-white shadow-md p-2 rounded-full hover:bg-gray-100 transition"
+                                >
+                                    <ChevronRightIcon className="w-5 h-5 text-gray-700" />
+                                </button>
+                            </div>
+                            {/* Popup vidéo */}
+                            {openVideo && (
+                                <div
+                                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60"
+                                    onClick={() => setOpenVideo(null)} // <-- ferme la popup si on clique sur le fond
+                                >
+                                    <div
+                                        className="bg-white rounded-2xl p-6 shadow-lg relative max-w-2xl w-full flex flex-col items-center"
+                                        onClick={e => e.stopPropagation()} // <-- empêche la fermeture si on clique dans la modale
+                                    >
+                                        <button
+                                            className="absolute top-2 right-4 text-3xl text-purple-400 hover:text-purple-600 font-bold"
+                                            onClick={() => setOpenVideo(null)}
+                                            aria-label="Fermer"
+                                        >&times;</button>
+                                        <h4 className="font-bold text-lg mb-2">{openVideo.title}</h4>
+                                        <video
+                                            src={`/api/videos/${openVideo._id}/stream`}
+                                            controls
+                                            autoPlay
+                                            className="rounded-xl w-full max-h-[60vh] bg-black"
+                                        />
+                                        <div className="text-sm text-gray-600 mt-2">{openVideo.category}</div>
+                                    </div>
+                                </div>
+                            )}
                         </section>
                         <section className="bg-purple-200 rounded-3xl p-6 m-4 mb-0.5 flex flex-col items-flex-start justify-left w-full">
                             <h4 className="text-2xl font-semibold mb-4">Les lives de {selectedSubject} en cours &#8680;</h4>
@@ -170,7 +252,7 @@ function MainPage(){
                                                     className="relative w-80 h-60 rounded-xl overflow-hidden shadow-md bg-cover bg-center"
                                                     style={{ backgroundImage: `url(${meet.imageUrl || '/img/studentWorking.png'})` }}
                                                 >
-                                                    {tokens < meet.rejoinCost && meet.createdBy._id !== user._id && !meet.participants.includes(user._id) && (
+                                                    {tokens < meet.rejoinCost && meet.createdBy !== user._id && !meet.participants.includes(user._id) && (
                                                         <>
                                                             <div className="absolute inset-0 bg-gray-200/70 z-10 pointer-events-none" />
                                                             <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
@@ -193,17 +275,17 @@ function MainPage(){
 
                                                         <div className="flex justify-between items-end mt-auto">
                                                             <a
-                                                                href={tokens < meet.rejoinCost && meet.createdBy._id !== user._id && !meet.participants.includes(user._id) ? "" : meet.hangoutLink}
+                                                                href={tokens < meet.rejoinCost && meet.createdBy !== user._id && !meet.participants.includes(user._id) ? "" : meet.hangoutLink}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 onClick={async (e) => { await handleMeetingJoin(meet) }}
-                                                                className={`text-sm font-semibold px-3 py-1 rounded-full transition ${tokens < meet.rejoinCost && meet.createdBy._id !== user._id && !meet.participants.includes(user._id)
+                                                                className={`text-sm font-semibold px-3 py-1 rounded-full transition ${tokens < meet.rejoinCost && meet.createdBy !== user._id && !meet.participants.includes(user._id)
                                                                         ? 'bg-gray-400 cursor-not-allowed'
                                                                         : 'bg-blue-600 hover:bg-blue-700 text-white'
                                                                     }`}>
-                                                                {meet.createdBy._id === user._id ? "Rejoindre mon live" : "Rejoindre le live"}
+                                                                {meet.createdBy === user._id ? "Rejoindre mon live" : "Rejoindre le live"}
                                                             </a>
-                                                            {(meet.createdBy._id !== user._id && !meet.participants.includes(user._id)) && (
+                                                            {(meet.createdBy !== user._id && !meet.participants.includes(user._id)) && (
                                                                 <div className="flex items-center bg-orange-100 text-orange-700 font-semibold rounded-xl px-2 py-1 w-fit">
                                                                     <span className='pr-1'>Coût :</span>
                                                                     <img src="./../img/token.png" alt="SwapTokens logo" className="w-5 h-5" />

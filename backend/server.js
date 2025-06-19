@@ -109,10 +109,10 @@ server.listen(PORT, async () => {
   console.log(`Server listening on port ${PORT}.`);
   console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
   // App first initialization
-  const savedApp = await MyApp.findOne({name: "CoursWap"});
+  const savedApp = await MyApp.findOne({name: "CoursWapFreddy"});
   if (!savedApp) {
       const tokenAPIKey = await tokenService.getAPIKey();
-      const myApp = new MyApp({name: "CoursWap", tokenAPIKey: tokenAPIKey, tokenRegeneratedDate: new Date().now()});
+      const myApp = new MyApp({name: "CoursWapFreddy", tokenAPIKey: tokenAPIKey, tokenRegeneratedDate:  Date.now()});
       myApp.save();
   } 
   // --------

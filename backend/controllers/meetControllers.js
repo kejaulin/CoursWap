@@ -2,6 +2,7 @@ const authService = require('../services/authService');
 const meetService = require('../services/meetService');
 const Meeting = require('../models/Meet');
 const userService = require('../services/userService');
+const wordCloudService = require('../services/wordCloudService');
 
 exports.createMeet = async (req, res) => {
     try {
@@ -15,7 +16,7 @@ exports.createMeet = async (req, res) => {
 
         const auth = await authService.getAuthorizedClient(req.user);
         const event = await meetService.createGoogleMeet(auth, req.body);
-
+        const wordCloud = await wordCloudService.generateWordCloud(keywords.join(' '));
         const meeting = new Meeting({
             matiere: matiere,
             summary: event.summary,
@@ -27,7 +28,8 @@ exports.createMeet = async (req, res) => {
             rejoinCost: rejoinCost,
             originalCost: originalCost,
             participants: [],
-            keywords: keywords
+            keywords: keywords.join(' '),
+            imageUrl: wordCloud.image
         });
         await meeting.save();
         return res.status(201).json(event);
