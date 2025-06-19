@@ -28,6 +28,7 @@ exports.googleCallback = (req,res,next) =>{
     try{
         passport.authenticate('google',{
             failureRedirect:`${BACK_URL}:${PORT}/auth/google`,
+            session: true,
             successRedirect:FRONT_URL})(req, res, next);
     } catch (err){
         next(err);

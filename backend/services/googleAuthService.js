@@ -29,6 +29,7 @@ passport.use(
       accessType: 'offline',
       prompt: 'consent',
       passReqToCallback: true,
+      proxy: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {

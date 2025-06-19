@@ -4,7 +4,7 @@ const cors = require('cors');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
 const mongoose = require('mongoose');
-const http = require('http');
+const https = require('https');
 const { Server } = require('socket.io');
 
 require("dotenv").config();
@@ -17,11 +17,13 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const app = express();
 const path = require('path');
+const fs = require('fs');
 
 const PORT = process.env.PORT || 4000;
 const FRONT_URL =  process.env.FRONT_URL || "http://localhost:3000";
 const BACK_URL =  process.env.BACK_URL || "http://localhost";
 const PLATFORM_NAME = process.env.PLATFORM_NAME || "CoursWap";
+const DEV_ENV = process.env.DEV_ENV || "http://localhost:4000";
 
 const meetRoutes = require('./routes/meetRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -34,14 +36,29 @@ const calendarRoutes = require('./routes/calendarRoutes');
 
 const MyApp = require('./models/App');
 
-const server = http.createServer(app);
-const io = new Server(server,{
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST","PUT","DELETE"],
-    credentials:true
+const server = https.createServer({
+  key: fs.readFileSync('/tmp/ssl/privkey.pem','utf8'),
+  cert: fs.readFileSync('/tmp/ssl/fullchain.pem','utf8'),
+},app);
+
+const allowedOrigins = [
+  FRONT_URL,
+  DEV_ENV
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
   },
-});
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"]
+};
+
+const io = new Server(server,{ cors: corsOptions});
 app.set('io', io);
 
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost/cours-wap-bdd';
@@ -52,15 +69,16 @@ mongoose.connect(mongoUri).then(() => {
 });
 
 app.use(bodyParser.json());
-app.use(cors({origin:FRONT_URL,
-  methods: "GET,POST,PUT,DELETE",
-  credentials:true}));
+app.use(cors(corsOptions));
 
 // OAuth and others --
 app.use(
   cookieSession({
+    name: 'session',
     maxAge: 30*24*60*60*1000,
-    keys: [process.env.COOKIE_KEY]
+    keys: [process.env.COOKIE_KEY],
+    sameSite: 'none',
+    secure: true 
   })
 );
 app.use(passport.initialize());

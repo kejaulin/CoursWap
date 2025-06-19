@@ -4,9 +4,16 @@ import { useEffect, useState } from 'react';
 import { UserPlusIcon } from '@heroicons/react/24/solid';
 import { io } from "socket.io-client";
 
-const socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000');
+const socket_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000';
+const socket = io(socket_URL, {
+  transports: ['websocket'],
+  withCredentials: true,
+});
 
 function Header() {
+  console.log(socket);
+  console.log("Socket URL:", socket_URL);
+
   const [tokens, setTokens] = useState(0);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -21,6 +28,7 @@ function Header() {
   };
 
   useEffect(() => {
+    console.log("User in Header:", user);
     if (!user?._id) return;
 
     let subscribedAppId = null;

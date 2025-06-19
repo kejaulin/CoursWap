@@ -6,7 +6,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 
 function MainPage(){
     const Server_URL = import.meta.env.VITE_SERVER_URL;
-
+    const test = import.meta.env.VITE_SOCKET_URL || 'fofo';
     const { user, logout } = useAuth();
 
     const [selectedSubject, setSelectedSubject] = useState(null);
