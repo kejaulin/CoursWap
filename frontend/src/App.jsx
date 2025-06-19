@@ -6,6 +6,7 @@ import LoginRegister from './pages/LoginRegister';
 import CreateMeetingPage from './pages/CreateMeetingPage';
 import { useAuth } from './component/AuthProvider';
 import ProfilPage from './pages/ProfilPage';
+import GererQuizPage from './pages/GererQuizPage';
 
 function App() {
   const { user, logout } = useAuth();
@@ -19,6 +20,7 @@ function App() {
             <Route path="/" element={<MainPage/>} />
             <Route path="/profs/:id" element={<ContactProfesseur />} />
             <Route path="/profil" element={<ProfilPage />} />
+            <Route path="/gerer-quiz" element={<GererQuizPage />} />
           </Routes>
         :
         <Routes>

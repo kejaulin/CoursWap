@@ -10,8 +10,9 @@ exports.googleAuthenticate = (req,res,next) =>{
     try{
         console.log('Google authentication initiated');
         passport.authenticate('google', {
-            scope: ['profile', 'email', 'https://www.googleapis.com/auth/calendar'],
+            scope: ['profile', 'email', 'https://www.googleapis.com/auth/calendar','https://www.googleapis.com/auth/forms.body'],
             accessType: 'offline',
+            prompt: 'consent'
         })(req, res, next);
     } catch (err){
         next(err);

@@ -20,6 +20,10 @@ export default defineConfig({
         target: 'http://localhost:4000/courswap',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/app/, ''),
+      },
+      '/quizzes': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
       }
     }, 
   }

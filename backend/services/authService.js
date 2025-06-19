@@ -8,6 +8,7 @@ const SCOPES = ["https://www.googleapis.com/auth/calendar"];
 
 const authService = {
     async getAuthorizedClient(user) {
+        console.log('getAuthorizedClient: user.refreshToken =', user.refreshToken);
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,

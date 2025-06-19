@@ -97,6 +97,14 @@ function Header() {
                 <UserPlusIcon className="w-6 h-6" />
                 <span className="hidden sm:inline whitespace-nowrap">Profil</span>
               </button>
+              {user && user.role === 'professeur' && (
+                <button
+                  onClick={() => navigate('/gerer-quiz')}
+                  className="flex items-center gap-2 bg-green-100 hover:bg-green-200 text-green-700 font-semibold rounded-xl px-4 py-2 transition"
+                >
+                  <span className="hidden sm:inline whitespace-nowrap">Gérer Quiz</span>
+                </button>
+              )}
               <button
                 onClick={handleLogout}
                 className="border px-4 py-1 rounded-2xl hover:bg-blue-600 hover:text-white font-bold"

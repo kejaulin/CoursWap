@@ -41,7 +41,7 @@ const io = new Server(server,{
 });
 app.set('io', io);
 
-mongoose.connect('mongodb://localhost/cours-wap-bdd').then(() => {
+mongoose.connect('mongodb+srv://LO10developer:v8ltFGihh3uHy0aY@courswapcluster.omtueoa.mongodb.net/').then(() => {
     console.log('Connected to MongoDB.');
   }).catch(error => {
     console.error(error);
@@ -112,7 +112,7 @@ server.listen(PORT, async () => {
   const savedApp = await MyApp.findOne({name: "CoursWap"});
   if (!savedApp) {
       const tokenAPIKey = await tokenService.getAPIKey();
-      const myApp = new MyApp({name: "CoursWap", tokenAPIKey: tokenAPIKey, tokenRegeneratedDate: new Date().now()});
+      const myApp = new MyApp({name: "CoursWap", tokenAPIKey: tokenAPIKey, tokenRegeneratedDate: new Date()});
       myApp.save();
   } 
   // --------
@@ -128,6 +128,8 @@ app.use('/onetooneevents', oneToOneEventRoutes );
 app.use('/calendar', calendarRoutes);
 
 const videoRoutes = require('./routes/videoRoutes');
+const quizRoutes = require('./routes/quizRoutes');
 app.use('/videos', videoRoutes);
+app.use('/quizzes', quizRoutes);
 
 app.use('/stats', statsRoutes);

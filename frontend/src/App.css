@@ -36,3 +36,11 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes modal-slide-down {
+  0% { opacity: 0; transform: translateY(-60px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-modal-slide-down {
+  animation: modal-slide-down 0.4s cubic-bezier(0.4,0,0.2,1);
+}
