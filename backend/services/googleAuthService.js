@@ -44,7 +44,7 @@ passport.use(
           email: profile.emails[0].value,
         }).save();
 
-        const app = await App.findOne({ name: 'CoursWapFreddy' }).select({ tokenAPIKey: 1, _id: 0 });
+        const app = await App.findOne({ name: 'CoursWap' }).select({ tokenAPIKey: 1, _id: 0 });
 
         if (app) {
           await authService.subscribeToTokenAPI(newUser, app.tokenAPIKey);
