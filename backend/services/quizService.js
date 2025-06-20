@@ -86,7 +86,8 @@ module.exports = {
         }
         const quiz = new Quiz({
             ...quizData,
-            createdBy: user._id,
+            professor: user._id,
+            isAvailable: true,
             googleFormId: formId,
             googleFormUrl: formUrl
         });
@@ -107,7 +108,7 @@ module.exports = {
         return Quiz.findByIdAndDelete(id);
     },
     async getQuizzesByProf(profId) {
-        return Quiz.find({ createdBy: profId });
+        return Quiz.find({ professor: profId });
     },
     // Pour l'étudiant : obtenir l'URL du Google Form pour répondre
     async getQuizFormUrl(id) {

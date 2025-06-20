@@ -206,5 +206,24 @@ router.post('/register', useAppTokenApiKey, authController.userRegister);
  */
 router.get('/appinfos', authController.getAppInfos);
 
+/**
+ * @swagger
+ * /auth/professors:
+ *   get:
+ *     summary: Récupère la liste de tous les professeurs
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Liste des professeurs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Erreur serveur
+ */
+router.get('/professors', authController.getProfessors);
 
 module.exports = router;

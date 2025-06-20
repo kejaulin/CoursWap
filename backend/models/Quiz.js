@@ -39,8 +39,9 @@ const quizSchema = new mongoose.Schema({
         required: true
     },
     questions: [questionSchema],
-    createdBy: {
-        type: String,
+    professor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
         required: true
     },
     createdAt: {

@@ -90,6 +90,22 @@ function Header() {
 
             <div className="sm:block h-8 border-l-1 border-gray-400 mx-4"></div>
             <div className="inline-flex items-center gap-4">
+              {user.role === 'professeur' && (
+                <button
+                  onClick={() => navigate('/gerer-quiz')}
+                  className="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-xl px-4 py-2 transition"
+                >
+                  Gérer Quiz
+                </button>
+              )}
+              {user.role === 'etudiant' && (
+                <button
+                  onClick={() => navigate('/exercices')}
+                  className="flex items-center gap-2 bg-green-100 hover:bg-green-200 text-green-700 font-semibold rounded-xl px-4 py-2 transition"
+                >
+                  S'exercer
+                </button>
+              )}
               <button
                 onClick={() => navigate('/profil')}
                 className="flex items-center gap-2 bg-purple-100 hover:bg-purple-200 text-purple-700 font-semibold rounded-xl px-4 py-2 transition"
@@ -97,14 +113,6 @@ function Header() {
                 <UserPlusIcon className="w-6 h-6" />
                 <span className="hidden sm:inline whitespace-nowrap">Profil</span>
               </button>
-              {user && user.role === 'professeur' && (
-                <button
-                  onClick={() => navigate('/gerer-quiz')}
-                  className="flex items-center gap-2 bg-green-100 hover:bg-green-200 text-green-700 font-semibold rounded-xl px-4 py-2 transition"
-                >
-                  <span className="hidden sm:inline whitespace-nowrap">Gérer Quiz</span>
-                </button>
-              )}
               <button
                 onClick={handleLogout}
                 className="border px-4 py-1 rounded-2xl hover:bg-blue-600 hover:text-white font-bold"

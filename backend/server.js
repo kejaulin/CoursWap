@@ -9,6 +9,7 @@ const { Server } = require('socket.io');
 
 require("dotenv").config();
 require('./models/User');
+require('./models/Quiz');
 require('./services/googleAuthService');
 require('./services/localAuthService');
 const tokenService = require('./services/tokenService');
@@ -71,7 +72,7 @@ const swaggerOptions = {
     info: {
       title: 'CoursWap API',
       version: '1.0.0',
-      description: 'Documentation de l’API CoursWap',
+      description: 'Documentation de l\'API CoursWap',
     },
     servers: [
       {

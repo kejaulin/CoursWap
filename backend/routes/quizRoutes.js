@@ -185,6 +185,24 @@ router.delete('/:id', ensureAuth, quizController.ensureProf, quizController.dele
 // ETUDIANT
 /**
  * @swagger
+ * /quizzes/stats:
+ *   get:
+ *     summary: Récupérer les statistiques de l'étudiant connecté
+ *     tags: [Quizzes]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Statistiques de l'étudiant
+ *       401:
+ *         description: Non authentifié
+ *       403:
+ *         description: Accès réservé aux étudiants
+ */
+router.get('/stats', ensureAuth, quizController.ensureStudent, quizController.getStudentStats);
+
+/**
+ * @swagger
  * /quizzes/available:
  *   get:
  *     summary: Lister les quiz disponibles (étudiant)
@@ -205,7 +223,43 @@ router.delete('/:id', ensureAuth, quizController.ensureProf, quizController.dele
  *       403:
  *         description: Accès réservé aux étudiants
  */
-router.get('/available', ensureAuth, quizController.ensureStudent, quizController.listAvailableQuizzes); // Lister quiz disponibles
+router.get('/available', ensureAuth, quizController.ensureStudent, quizController.getAvailableQuizzes); // Lister quiz disponibles
+/**
+ * @swagger
+ * /quizzes/{id}/submit:
+ *   post:
+ *     summary: Soumettre les réponses à un quiz (étudiant)
+ *     tags: [Quizzes]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID du quiz
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               answers:
+ *                 type: object
+ *                 description: "Objet avec les ID de question comme clés et les réponses comme valeurs"
+ *     responses:
+ *       200:
+ *         description: Quiz soumis avec succès, retourne le score
+ *       401:
+ *         description: Non authentifié
+ *       403:
+ *         description: Accès réservé aux étudiants
+ *       404:
+ *         description: Quiz non trouvé
+ */
+router.post('/:id/submit', ensureAuth, quizController.ensureStudent, quizController.submitQuiz);
 /**
  * @swagger
  * /quizzes/{id}/form:

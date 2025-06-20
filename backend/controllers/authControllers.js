@@ -95,3 +95,12 @@ exports.getAppInfos = async (req,res) => {
         return res.status(500).json({ error: err.message });   
     }
 }
+
+exports.getProfessors = async (req, res) => {
+    try {
+        const professors = await User.find({ role: 'professeur' }).select('name email _id');
+        res.json(professors);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
